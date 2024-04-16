@@ -1,60 +1,14 @@
 package com.example.plugins
 
-import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
-import com.example.plugins.*
+import org.jetbrains.exposed.sql.Database
+
 
 fun Application.configureDatabases() {
     Database.connect(
-        url = "jdbc:postgresql://localhost:5432/database",
+        url = "jdbc:postgresql://localhost:5431/postgresdb",
         driver = "org.postgresql.Driver",
-        user = "root",
-        password = "root"
+        user = "postgres",
+        password = "postgres"
     )
-
-    transaction {
-        SchemaUtils.create(Users) // Create your database tables if they don't exist
-    }
-
-    val userService = UserService()
-
-    routing {
-        // Create user
-        post("/users") {
-            val user = call.receive<ExposedUser>()
-            val id = userService.create(user)
-            call.respond(HttpStatusCode.Created, id)
-        }
-
-        // Read user
-        get("/users/{id}") {
-            val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
-            val user = userService.read(id)
-            if (user != null) {
-                call.respond(HttpStatusCode.OK, user)
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
-        }
-
-        // Update user
-        put("/users/{id}") {
-            val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
-            val user = call.receive<ExposedUser>()
-            userService.update(id, user)
-            call.respond(HttpStatusCode.OK)
-        }
-
-        // Delete user
-        delete("/users/{id}") {
-            val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
-            userService.delete(id)
-            call.respond(HttpStatusCode.OK)
-        }
-    }
 }
