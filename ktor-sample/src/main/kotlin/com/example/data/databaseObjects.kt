@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 
 @Serializable
 data class ExposedUsers(
+    val id: Int,
     val loginEmail: String,
     val hashedPassword: String,
 )
@@ -20,6 +21,7 @@ object Users : IntIdTable("users") {
 
 @Serializable
 data class ExposedDevices(
+    val id: Int,
     var userId: Int,
     var type: String
 )
@@ -31,6 +33,7 @@ object Devices : IntIdTable("devices") {
 
 @Serializable
 data class ExposedLocations(
+    val id: Int,
     val deviceId: Int,
     val latitude: String,
     val longitude: String,
@@ -47,6 +50,7 @@ object Locations : IntIdTable("locations") {
 
 @Serializable
 data class ExposedGeofences(
+    val id: Int,
     val deviceId: Int
 )
 
@@ -56,6 +60,7 @@ object Geofences : IntIdTable("geofences") {
 
 @Serializable
 data class ExposedGeofenceVertices(
+    val id: Int,
     val geofenceId: Int,
     val latitude: String,
     val longitude: String

@@ -4,6 +4,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import com.example.data.*
+import org.jetbrains.exposed.dao.id.EntityID
 
 
 class GeofenceVerticesService {
@@ -13,18 +14,35 @@ class GeofenceVerticesService {
         }
     }
 
-    suspend fun create(geofencevertex: ExposedGeofenceVertices): Int = dbQuery {
-        GeofenceVertices.insert {
-            it[geofenceId] = geofencevertex.geofenceId
-            it[latitude] = geofencevertex.latitude
-            it[longitude] = geofencevertex.longitude
-        }[GeofenceVertices.id].value
+    suspend fun getAll(geofenceId: Int): List<ExposedGeofenceVertices> {
+        return dbQuery {
+            GeofenceVertices.selectAll().where { GeofenceVertices.geofenceId eq geofenceId }
+                .map {
+                    ExposedGeofenceVertices(
+                        it[GeofenceVertices.id].value,
+                        it[GeofenceVertices.geofenceId].value,
+                        it[GeofenceVertices.latitude],
+                        it[GeofenceVertices.longitude]
+                    )
+                }
+        }
     }
+
+
+    suspend fun create(geofenceId: Int, latitude: String, longitude: String): Int = dbQuery {
+        GeofenceVertices.insertAndGetId {
+            it[GeofenceVertices.geofenceId] = EntityID(geofenceId, GeofenceVertices)
+            it[GeofenceVertices.latitude] = latitude
+            it[GeofenceVertices.longitude] = longitude
+        }.value
+    }
+
 
     suspend fun read(id: Int): ExposedGeofenceVertices? {
         return dbQuery {
             GeofenceVertices.selectAll().where { GeofenceVertices.id eq id }
                 .map { ExposedGeofenceVertices(
+                    it[GeofenceVertices.id].value,
                     it[GeofenceVertices.geofenceId].value,
                     it[GeofenceVertices.latitude],
                     it[GeofenceVertices.longitude]
@@ -36,7 +54,7 @@ class GeofenceVerticesService {
     suspend fun update(id: Int, geofencevertex: ExposedGeofenceVertices) {
         dbQuery {
             GeofenceVertices.update({ GeofenceVertices.id eq id }) {
-                it[geofenceId] = geofencevertex.geofenceId
+                it[geofenceId] = EntityID(geofencevertex.geofenceId, GeofenceVertices)
                 it[latitude] = geofencevertex.latitude
                 it[longitude] = geofencevertex.longitude
             }

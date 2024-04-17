@@ -17,29 +17,31 @@ class UserService {
         }
     }
 
-    suspend fun login(user: ExposedUsers): Boolean = dbQuery {
+    suspend fun login(loginEmail: String, hashedPassword: String): Boolean = dbQuery {
         Users.selectAll()
-            .where { (Users.loginEmail eq user.loginEmail) and (Users.hashedPassword eq user.hashedPassword) }
+            .where { (Users.loginEmail eq loginEmail) and (Users.hashedPassword eq hashedPassword) }
             .count() > 0
     }
 
-    suspend fun exists(user: ExposedUsers): Boolean = dbQuery {
-        Users.selectAll().where { Users.loginEmail eq user.loginEmail }
+    suspend fun exists(loginEmail: String): Boolean = dbQuery {
+        Users.selectAll().where { Users.loginEmail eq loginEmail }
             .count() > 0
     }
 
 
-    suspend fun create(user: ExposedUsers): Int = dbQuery {
-        Users.insert {
-            it[loginEmail] = user.loginEmail
-            it[hashedPassword] = user.hashedPassword
-        }[Users.id].value
+    suspend fun create(loginEmail: String, hashedPassword: String): Int = dbQuery {
+        Users.insertAndGetId {
+            it[Users.loginEmail] = loginEmail
+            it[Users.hashedPassword] = hashedPassword
+        }.value
     }
+
 
     suspend fun read(id: Int): ExposedUsers? {
         return dbQuery {
             Users.selectAll().where { Users.id eq id }
                 .map { ExposedUsers(
+                        it[Users.id].value,
                         it[Users.loginEmail],
                         it[Users.hashedPassword]
                     )
@@ -47,14 +49,15 @@ class UserService {
         }
     }
 
-    suspend fun update(id: Int, user: ExposedUsers) {
+    suspend fun update(id: Int, loginEmail: String, hashedPassword: String) {
         dbQuery {
             Users.update({ Users.id eq id }) {
-                it[loginEmail] = user.loginEmail
-                it[hashedPassword] = user.hashedPassword
+                it[Users.loginEmail] = loginEmail
+                it[Users.hashedPassword] = hashedPassword
             }
         }
     }
+
 
     suspend fun delete(id: Int) {
         dbQuery {
