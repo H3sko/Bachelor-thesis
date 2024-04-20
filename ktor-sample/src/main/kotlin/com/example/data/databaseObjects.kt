@@ -11,24 +11,24 @@ import java.time.LocalDateTime
 data class ExposedUsers(
     val id: Int,
     val loginEmail: String,
-    val hashedPassword: String,
+    val password: String,
 )
 
 object Users : IntIdTable("users") {
     val loginEmail = varchar("login_email", length = 255)
-    val hashedPassword = varchar("hashed_password", length = 255)
+    val password = varchar("password", length = 255)
 }
 
 @Serializable
 data class ExposedDevices(
     val id: Int,
     var userId: Int,
-    var type: String
+    var name: String
 )
 
 object Devices : IntIdTable("devices") {
     val userId = reference("userId", Users)
-    val type = varchar("type", length = 255)
+    val name = varchar("type", length = 255)
 }
 
 @Serializable

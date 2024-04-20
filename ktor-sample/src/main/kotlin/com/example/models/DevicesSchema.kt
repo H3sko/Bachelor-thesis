@@ -21,16 +21,16 @@ class DeviceService {
                     ExposedDevices(
                         it[Devices.id].value,
                         it[Devices.userId].value,
-                        it[Devices.type]
+                        it[Devices.name]
                     )
                 }
         }
     }
 
-    suspend fun create(userId: Int, type: String): Int = dbQuery {
+    suspend fun create(device: ExposedDevices): Int = dbQuery {
         Devices.insertAndGetId {
-            it[Devices.userId] = EntityID(userId, Devices)
-            it[Devices.type] = type
+            it[userId] = EntityID(device.userId, Devices)
+            it[name] = device.name
         }.value
     }
 
@@ -42,17 +42,17 @@ class DeviceService {
                     ExposedDevices(
                         it[Devices.id].value,
                         it[Devices.userId].value,
-                        it[Devices.type]
+                        it[Devices.name]
                     )
                 }.singleOrNull()
         }
     }
 
-    suspend fun update(id: Int, device: ExposedDevices) {
+    suspend fun update(device: ExposedDevices) {
         dbQuery {
-            Devices.update({ Devices.id eq id }) {
+            Devices.update({ Devices.id eq device.id }) {
                 it[userId] = EntityID(device.userId, Devices)
-                it[type] = device.type
+                it[name] = device.name
             }
         }
     }

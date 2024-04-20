@@ -29,11 +29,11 @@ class GeofenceVerticesService {
     }
 
 
-    suspend fun create(geofenceId: Int, latitude: String, longitude: String): Int = dbQuery {
+    suspend fun create(geofenceVertex: ExposedGeofenceVertices): Int = dbQuery {
         GeofenceVertices.insertAndGetId {
-            it[GeofenceVertices.geofenceId] = EntityID(geofenceId, GeofenceVertices)
-            it[GeofenceVertices.latitude] = latitude
-            it[GeofenceVertices.longitude] = longitude
+            it[geofenceId] = EntityID(geofenceVertex.geofenceId, GeofenceVertices)
+            it[latitude] = geofenceVertex.latitude
+            it[longitude] = geofenceVertex.longitude
         }.value
     }
 
@@ -51,9 +51,9 @@ class GeofenceVerticesService {
         }
     }
 
-    suspend fun update(id: Int, geofencevertex: ExposedGeofenceVertices) {
+    suspend fun update(geofencevertex: ExposedGeofenceVertices) {
         dbQuery {
-            GeofenceVertices.update({ GeofenceVertices.id eq id }) {
+            GeofenceVertices.update({ GeofenceVertices.id eq geofencevertex.id }) {
                 it[geofenceId] = EntityID(geofencevertex.geofenceId, GeofenceVertices)
                 it[latitude] = geofencevertex.latitude
                 it[longitude] = geofencevertex.longitude

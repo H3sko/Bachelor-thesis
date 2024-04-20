@@ -1,0 +1,118 @@
+POST http://127.0.0.1:8080/device/add
+Content-Type: application/json
+
+{
+  "id": 100,
+  "userId": 1,
+  "name": "Airtag 1"
+}
+
+###
+POST http://127.0.0.1:8080/device/add
+Content-Type: application/json
+
+{
+  "id": 101,
+  "userId": 1,
+  "name": "Airtag 7"
+}
+
+###
+POST http://127.0.0.1:8080/device/add
+Content-Type: application/json
+
+{
+  "id": 102,
+  "userId": 1,
+  "name": "Airtag 43"
+}
+
+###
+POST http://127.0.0.1:8080/device/add
+Content-Type: application/json
+
+{
+  "id": 103,
+  "userId": 2,
+  "name": "Airtag 1"
+}
+
+###
+POST http://127.0.0.1:8080/device/add
+Content-Type: application/json
+
+{
+  "id": 104,
+  "userId": 2,
+  "name": "Airtag 15"
+}
+
+###
+POST http://127.0.0.1:8080/device/add
+Content-Type: application/json
+
+{
+  "id": 105,
+  "userId": 3,
+  "name": "Airtag 16"
+}
+
+###
+GET http://127.0.0.1:8080/device/getAll/1
+Content-Type: application/json
+
+###
+GET http://127.0.0.1:8080/device/getAll/2
+Content-Type: application/json
+
+###
+GET http://127.0.0.1:8080/device/getAll/3
+Content-Type: application/json
+
+###
+GET http://127.0.0.1:8080/device/100
+Content-Type: application/json
+
+###
+GET http://127.0.0.1:8080/device/101
+Content-Type: application/json
+
+###
+GET http://127.0.0.1:8080/device/102
+Content-Type: application/json
+
+###
+GET http://127.0.0.1:8080/device/103
+Content-Type: application/json
+
+###
+GET http://127.0.0.1:8080/device/104
+Content-Type: application/json
+
+###
+GET http://127.0.0.1:8080/device/105
+Content-Type: application/json
+
+###
+DELETE http://127.0.0.1:8080/device/100
+Content-Type: application/json
+
+###
+DELETE http://127.0.0.1:8080/device/101
+Content-Type: application/json
+
+###
+DELETE http://127.0.0.1:8080/device/102
+Content-Type: application/json
+
+###
+DELETE http://127.0.0.1:8080/device/103
+Content-Type: application/json
+
+###
+DELETE http://127.0.0.1:8080/device/104
+Content-Type: application/json
+
+###
+DELETE http://127.0.0.1:8080/device/105
+Content-Type: application/json

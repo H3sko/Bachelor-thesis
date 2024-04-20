@@ -1,0 +1,30 @@
+POST http://127.0.0.1:8080/user/register
+Content-Type: application/json
+
+{
+  "id": 1,
+  "loginEmail": "test@test.com",
+  "password": "password"
+}
+
+###
+GET http://127.0.0.1:8080/user/login
+Content-Type: application/json
+
+{
+  "id": 1,
+  "loginEmail": "test@test.com",
+  "password": "password"
+}
+
+###
+GET http://127.0.0.1:8080/user/1
+Content-Type: application/json
+
+###
+PUT http://127.0.0.1:8080/user/1/changeCredentials/test2@test.com/password2
+Content-Type: application/json
+
+###
+DELETE http://127.0.0.1:8080/user/1
+Content-Type: application/json

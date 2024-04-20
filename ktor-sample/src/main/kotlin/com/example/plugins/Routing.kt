@@ -9,9 +9,7 @@ import io.ktor.server.routing.*
 import com.example.models.*
 import com.example.data.*
 import org.jetbrains.exposed.exceptions.ExposedSQLException
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
+
 
 fun Application.configureRouting() {
     install(StatusPages) {
@@ -71,42 +69,32 @@ fun Route.users() {
             }
 
         }
-        route("login/{login}/{password}") {
-            post {
-                val login = call.parameters["login"]
-                val password = call.parameters["password"]
+        route("login") {
+            get {
+                val user = call.receive<ExposedUsers>()
 
-                if (login != null && password != null) {
-                    val found = userService.login(login, password)
-                    if (found) {
-                        call.respond(HttpStatusCode.Found, "User was found")
-                    } else {
-                        call.respond(HttpStatusCode.NotFound, "User wasn't found")
-                    }
+                val found = userService.login(user)
+                if (found) {
+                    call.respond(HttpStatusCode.Found, "Logged in")
                 } else {
-                    call.respond(HttpStatusCode.BadRequest, "Missing 'login' or 'password' parameter")
+                    call.respond(HttpStatusCode.NotFound, "User wasn't found")
                 }
             }
 
         }
-        route("register/{login}/{password}") {
+        route("register") {
             post {
-                val login = call.parameters["login"]
-                val password = call.parameters["password"]
+                val user = call.receive<ExposedUsers>()
 
-                if (login != null && password != null) {
-                    if (userService.exists(login)) {
-                        call.respond(HttpStatusCode.Conflict, "User already exists")
-                    } else {
-                        try {
-                            val id = userService.create(login, password)
-                            call.respond(HttpStatusCode.Created, id)
-                        } catch (ex: ExposedSQLException) {
-                            call.respond(HttpStatusCode.InternalServerError, ex.cause.toString())
-                        }
-                    }
+                if (userService.exists(user.loginEmail)) {
+                    call.respond(HttpStatusCode.Conflict, "User already exists")
                 } else {
-                    call.respond(HttpStatusCode.BadRequest, "Missing 'login' or 'password' parameter")
+                    try {
+                        val id = userService.create(user)
+                        call.respond(HttpStatusCode.Created, id)
+                    } catch (ex: ExposedSQLException) {
+                        call.respond(HttpStatusCode.InternalServerError, ex.cause.toString())
+                    }
                 }
             }
 
@@ -142,37 +130,29 @@ fun Route.devices() {
                 } ?: call.respond(HttpStatusCode.NotFound, "Invalid ID")
             }
         }
-        route("{userId}/") {
-            route("add/{type}") {
-                post {
-                    val userId = call.parameters["userId"]?.toInt()
-                    val type = call.parameters["type"]
+        route("add") {
+            post {
+                val device = call.receive<ExposedDevices>()
 
-                    if (userId != null && type != null) {
-                        val id = deviceService.create(userId, type)
-                        call.respond(HttpStatusCode.Created, id)
-                    } else {
-                        call.respond(HttpStatusCode.BadRequest, "Missing 'userId' or 'type' parameter")
-                    }
-                }
-
+                val id = deviceService.create(device)
+                call.respond(HttpStatusCode.Created, id)
             }
-            route("getAll") {
-                get {
-                    val userId = call.parameters["userId"]?.toInt()
 
-                    if (userId != null) {
-                        val devices = deviceService.getAll(userId)
-                        if (devices.isNotEmpty()) {
-                            call.respond(HttpStatusCode.OK, devices)
-                        } else {
-                            call.respond(HttpStatusCode.NotFound)
-                        }
+        }
+        route("getAll/{userId}") {
+            get {
+                val userId = call.parameters["userId"]?.toInt()
+
+                if (userId != null) {
+                    val devices = deviceService.getAll(userId)
+                    if (devices.isNotEmpty()) {
+                        call.respond(HttpStatusCode.OK, devices)
                     } else {
-                        call.respond(HttpStatusCode.BadRequest, "Missing 'userId' parameter")
+                        call.respond(HttpStatusCode.NotFound)
                     }
+                } else {
+                    call.respond(HttpStatusCode.BadRequest, "Missing 'userId' parameter")
                 }
-
             }
         }
     }
@@ -206,45 +186,28 @@ fun Route.locations() {
                 } ?: call.respond(HttpStatusCode.NotFound, "Invalid ID")
             }
         }
-        route("/{deviceId}"){
-            route("/{timestamp}/{latitude}/{longitude}") {
-                post {
-                    val deviceId = call.parameters["deviceId"]?.toInt()
-                    val latitude = call.parameters["latitude"]
-                    val longitude = call.parameters["longitude"]
-                    val timestampString = call.parameters["timestamp"]
+        route("/add") {
+            post {
+                val location = call.receive<ExposedLocations>()
 
-                    if (deviceId != null && latitude != null && longitude != null && timestampString != null) {
-                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                        try {
-                            val timestamp = LocalDateTime.parse(timestampString, formatter)
-                            val id = locationsService.create(deviceId, latitude, longitude, timestamp)
-                            call.respond(HttpStatusCode.Created, id)
-                        } catch (ex: DateTimeParseException) {
-                            call.respond(HttpStatusCode.BadRequest, "Invalid timestamp format")
-                        }
-                    } else {
-                        call.respond(HttpStatusCode.BadRequest, "Missing 'deviceId', 'latitude', 'longitude', or 'timestamp' parameter")
-                    }
-                }
-
+                val id = locationsService.create(location)
+                call.respond(HttpStatusCode.Created, id)
             }
-            route("/getLatest") {
-                get {
-                    val deviceId = call.parameters["deviceId"]?.toInt()
+        }
+        route("getLatest/{deviceId}") {
+            get {
+                val deviceId = call.parameters["deviceId"]?.toInt()
 
-                    if (deviceId != null) {
-                        val location = locationsService.getLatest(deviceId)
-                        if (location != null) {
-                            call.respond(HttpStatusCode.OK, location)
-                        } else {
-                            call.respond(HttpStatusCode.NotFound)
-                        }
+                if (deviceId != null) {
+                    val location = locationsService.getLatest(deviceId)
+                    if (location != null) {
+                        call.respond(HttpStatusCode.OK, location)
                     } else {
-                        call.respond(HttpStatusCode.BadRequest, "Missing 'deviceId' parameter")
+                        call.respond(HttpStatusCode.NotFound)
                     }
+                } else {
+                    call.respond(HttpStatusCode.BadRequest, "Missing 'deviceId' parameter")
                 }
-
             }
         }
     }
@@ -278,7 +241,18 @@ fun Route.geofences() {
                 } ?: call.respond(HttpStatusCode.NotFound, "Invalid ID")
             }
         }
-        route("{deviceId}") {
+        post {
+            val geofence = call.receive<ExposedGeofences>()
+
+            val exists = geofenceService.getGeofence(geofence.deviceId)
+            if (exists != null) {
+                call.respond(HttpStatusCode.Conflict, "Geofence for this device already exists")
+            } else{
+                val id = geofenceService.create(geofence.deviceId)
+                call.respond(HttpStatusCode.Created, id)
+            }
+        }
+        route("device/{deviceId}") {
             get {
                 val deviceId = call.parameters["deviceId"]?.toInt()
 
@@ -293,23 +267,6 @@ fun Route.geofences() {
                     call.respond(HttpStatusCode.BadRequest, "Missing 'deviceId' parameter")
                 }
             }
-
-            post {
-                val deviceId = call.parameters["deviceId"]?.toInt()
-
-                if (deviceId != null) {
-                    val geofence = geofenceService.getGeofence(deviceId)
-                    if (geofence != null) {
-                        call.respond(HttpStatusCode.Conflict, "Geofence for this device already exists")
-                    } else{
-                        val id = geofenceService.create(deviceId)
-                        call.respond(HttpStatusCode.Created, id)
-                    }
-                } else {
-                    call.respond(HttpStatusCode.BadRequest, "Missing 'deviceId' parameter")
-                }
-            }
-
         }
     }
 }
@@ -342,37 +299,28 @@ fun Route.geofenceVertices() {
                 } ?: call.respond(HttpStatusCode.NotFound, "Invalid ID")
             }
         }
-        route("{geofenceId}") {
-            route("/getAll") {
-                get {
-                    val geofenceId = call.parameters["geofenceId"]?.toInt()
+        route("getAll/{geofenceId}") {
+            get {
+                val geofenceId = call.parameters["geofenceId"]?.toInt()
 
-                    if (geofenceId != null) {
-                        val vertices = geofenceVerticesService.getAll(geofenceId)
-                        if (vertices.isNotEmpty()) {
-                            call.respond(HttpStatusCode.OK, vertices)
-                        } else {
-                            call.respond(HttpStatusCode.NotFound)
-                        }
+                if (geofenceId != null) {
+                    val vertices = geofenceVerticesService.getAll(geofenceId)
+                    if (vertices.isNotEmpty()) {
+                        call.respond(HttpStatusCode.OK, vertices)
                     } else {
-                        call.respond(HttpStatusCode.BadRequest, "Missing 'geofenceId' parameter")
+                        call.respond(HttpStatusCode.NotFound)
                     }
+                } else {
+                    call.respond(HttpStatusCode.BadRequest, "Missing 'geofenceId' parameter")
                 }
             }
+        }
+        route("add") {
+            post {
+                val geofenceVertex = call.receive<ExposedGeofenceVertices>()
 
-            route("/{latitude}/{longitude}") {
-                post {
-                    val geofenceId = call.parameters["geofenceId"]?.toInt()
-                    val latitude = call.parameters["latitude"]
-                    val longitude = call.parameters["longitude"]
-
-                    if (geofenceId != null && latitude != null && longitude != null) {
-                        val id = geofenceVerticesService.create(geofenceId, latitude, longitude)
-                        call.respond(HttpStatusCode.Created, id)
-                    } else {
-                        call.respond(HttpStatusCode.BadRequest, "Missing 'latitude' or 'longitude' parameter")
-                    }
-                }
+                val id = geofenceVerticesService.create(geofenceVertex)
+                call.respond(HttpStatusCode.Created, id)
             }
         }
     }

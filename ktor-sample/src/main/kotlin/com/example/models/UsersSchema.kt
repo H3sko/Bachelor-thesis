@@ -17,9 +17,9 @@ class UserService {
         }
     }
 
-    suspend fun login(loginEmail: String, hashedPassword: String): Boolean = dbQuery {
+    suspend fun login(user: ExposedUsers): Boolean = dbQuery {
         Users.selectAll()
-            .where { (Users.loginEmail eq loginEmail) and (Users.hashedPassword eq hashedPassword) }
+            .where { (Users.loginEmail eq user.loginEmail) and (Users.password eq user.password) }
             .count() > 0
     }
 
@@ -29,10 +29,10 @@ class UserService {
     }
 
 
-    suspend fun create(loginEmail: String, hashedPassword: String): Int = dbQuery {
+    suspend fun create(user: ExposedUsers): Int = dbQuery {
         Users.insertAndGetId {
-            it[Users.loginEmail] = loginEmail
-            it[Users.hashedPassword] = hashedPassword
+            it[loginEmail] = user.loginEmail
+            it[password] = user.password
         }.value
     }
 
@@ -43,7 +43,7 @@ class UserService {
                 .map { ExposedUsers(
                         it[Users.id].value,
                         it[Users.loginEmail],
-                        it[Users.hashedPassword]
+                        it[Users.password]
                     )
                 }.singleOrNull()
         }
@@ -53,7 +53,7 @@ class UserService {
         dbQuery {
             Users.update({ Users.id eq id }) {
                 it[Users.loginEmail] = loginEmail
-                it[Users.hashedPassword] = hashedPassword
+                it[Users.password] = hashedPassword
             }
         }
     }

@@ -31,12 +31,12 @@ class LocationsService {
     }
 
 
-    suspend fun create(deviceId: Int, latitude: String, longitude: String, timestamp: LocalDateTime): Int = dbQuery {
+    suspend fun create(location: ExposedLocations): Int = dbQuery {
         Locations.insertAndGetId {
-            it[Locations.deviceId] = EntityID(deviceId, Locations)
-            it[Locations.latitude] = latitude
-            it[Locations.longitude] = longitude
-            it[Locations.timestamp] = timestamp
+            it[deviceId] = EntityID(location.deviceId, Locations)
+            it[latitude] = location.latitude
+            it[longitude] = location.longitude
+            it[timestamp] = location.timestamp
         }.value
     }
 
@@ -56,9 +56,9 @@ class LocationsService {
         }
     }
 
-    suspend fun update(id: Int, location: ExposedLocations) {
+    suspend fun update(location: ExposedLocations) {
         dbQuery {
-            Locations.update({ Locations.id eq id }) {
+            Locations.update({ Locations.id eq location.id }) {
                 it[deviceId] = EntityID(location.deviceId, Locations)
                 it[latitude] = location.latitude
                 it[longitude] = location.longitude
