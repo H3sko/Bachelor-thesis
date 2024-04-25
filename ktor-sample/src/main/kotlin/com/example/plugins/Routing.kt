@@ -45,24 +45,34 @@ fun Route.users() {
                     call.respond(HttpStatusCode.BadRequest, "Missing or invalid 'id' parameter")
                 }
             }
-
             delete {
                 val id = call.parameters["id"]?.toInt()
                 id?.let {
-                    userService.delete(id)
-                    call.respond(HttpStatusCode.OK, "User deleted")
+                    if (userService.delete(id)) {
+                        call.respond(HttpStatusCode.OK, "User deleted")
+                    } else {
+                        call.respond(HttpStatusCode.NotFound, "User not found")
+                    }
                 } ?: call.respond(HttpStatusCode.NotFound, "Invalid ID")
             }
         }
         route("changeCredentials/{login}/{password}") {
             put {
-                val id = call.parameters["id"]?.toInt()
+                val user = call.receive<ExposedUsers>()
                 val login = call.parameters["login"]
                 val password = call.parameters["password"]
 
-                if (id != null && login != null && password != null) {
-                    userService.update(id, login, password)
-                    call.respond(HttpStatusCode.OK, "Credentials updated")
+                if (login != null && password != null) {
+                    if ((userService.exists(login)) == null) {
+                        if (userService.login(user)) {
+                            userService.update(user.loginEmail, user.password, login, password)
+                            call.respond(HttpStatusCode.OK, "Credentials updated")
+                        } else {
+                            call.respond(HttpStatusCode.NotFound, "Wrong login or password")
+                        }
+                    } else {
+                        call.respond(HttpStatusCode.BadRequest, "User with the same login already exists")
+                    }
                 } else {
                     call.respond(HttpStatusCode.BadRequest, "Invalid credentials")
                 }
@@ -75,18 +85,17 @@ fun Route.users() {
 
                 val found = userService.login(user)
                 if (found) {
-                    call.respond(HttpStatusCode.Found, "Logged in")
+                    call.respond(HttpStatusCode.OK, "Logged in")
                 } else {
                     call.respond(HttpStatusCode.NotFound, "User wasn't found")
                 }
             }
-
         }
         route("register") {
             post {
                 val user = call.receive<ExposedUsers>()
 
-                if (userService.exists(user.loginEmail)) {
+                if (userService.exists(user.loginEmail) != null) {
                     call.respond(HttpStatusCode.Conflict, "User already exists")
                 } else {
                     try {
@@ -97,7 +106,23 @@ fun Route.users() {
                     }
                 }
             }
+        }
+        route("deleteAll") {
+            delete {
+                userService.deleteAllUsers()
+                call.respond(HttpStatusCode.OK, "All users deleted")
+            }
+        }
+        route("getAll") {
+            get {
+                val users = userService.getAllUsers()
 
+                if (users.isNotEmpty()) {
+                    call.respond(HttpStatusCode.Found, users)
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "Users table is empty")
+                }
+            }
         }
     }
 }
@@ -125,8 +150,11 @@ fun Route.devices() {
             delete {
                 val id = call.parameters["id"]?.toInt()
                 id?.let {
-                    deviceService.delete(id)
-                    call.respond(HttpStatusCode.OK, "Device deleted")
+                    if (deviceService.delete(id)) {
+                        call.respond(HttpStatusCode.OK, "Device deleted")
+                    } else {
+                        call.respond(HttpStatusCode.NotFound, "Device not found")
+                    }
                 } ?: call.respond(HttpStatusCode.NotFound, "Invalid ID")
             }
         }
@@ -134,10 +162,13 @@ fun Route.devices() {
             post {
                 val device = call.receive<ExposedDevices>()
 
-                val id = deviceService.create(device)
-                call.respond(HttpStatusCode.Created, id)
+                if (deviceService.exists(device).not()) {
+                    val id = deviceService.create(device)
+                    call.respond(HttpStatusCode.Created, id)
+                } else {
+                    call.respond(HttpStatusCode.Conflict, "Device already exists")
+                }
             }
-
         }
         route("getAll/{userId}") {
             get {
@@ -152,6 +183,23 @@ fun Route.devices() {
                     }
                 } else {
                     call.respond(HttpStatusCode.BadRequest, "Missing 'userId' parameter")
+                }
+            }
+        }
+        route("deleteAll") {
+            delete {
+                deviceService.deleteAllDevices()
+                call.respond(HttpStatusCode.OK, "All devices deleted")
+            }
+        }
+        route("getAll") {
+            get {
+                val devices = deviceService.getAllDevices()
+
+                if (devices.isNotEmpty()) {
+                    call.respond(HttpStatusCode.Found, devices)
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "Devices table is empty")
                 }
             }
         }
@@ -181,8 +229,11 @@ fun Route.locations() {
             delete {
                 val id = call.parameters["id"]?.toInt()
                 id?.let {
-                    locationsService.delete(id)
-                    call.respond(HttpStatusCode.OK, "Location deleted")
+                    if (locationsService.delete(id)) {
+                        call.respond(HttpStatusCode.OK, "Location deleted")
+                    } else {
+                        call.respond(HttpStatusCode.NotFound, "Location not found")
+                    }
                 } ?: call.respond(HttpStatusCode.NotFound, "Invalid ID")
             }
         }
@@ -190,8 +241,12 @@ fun Route.locations() {
             post {
                 val location = call.receive<ExposedLocations>()
 
-                val id = locationsService.create(location)
-                call.respond(HttpStatusCode.Created, id)
+                if (locationsService.exists(location).not()) {
+                    val id = locationsService.create(location)
+                    call.respond(HttpStatusCode.Created, id)
+                } else {
+                    call.respond(HttpStatusCode.Conflict, "Location already exists")
+                }
             }
         }
         route("getLatest/{deviceId}") {
@@ -210,14 +265,60 @@ fun Route.locations() {
                 }
             }
         }
+        route("deleteAll") {
+            route("/{deviceId}") {
+                delete {
+                    val deviceId = call.parameters["deviceId"]?.toInt()
+
+                    if (deviceId != null) {
+                        val deletedLocations = locationsService.deleteAll(deviceId)
+                        if (deletedLocations) {
+                            call.respond(HttpStatusCode.OK, "Locations deleted")
+                        } else {
+                            call.respond(HttpStatusCode.NotFound, "This device doesn't have any locations")
+                        }
+                    } else {
+                        call.respond(HttpStatusCode.BadRequest, "Missing 'deviceId' parameter")
+                    }
+                }
+            }
+            delete {
+                locationsService.deleteAll()
+                call.respond(HttpStatusCode.OK, "All locations deleted")
+            }
+        }
+        route("getAll") {
+            get {
+                val locations = locationsService.getAll()
+
+                if (locations.isNotEmpty()) {
+                    call.respond(HttpStatusCode.Found, locations)
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "Devices table is empty")
+                }
+            }
+        }
     }
 }
 
 
 fun Route.geofences() {
     val geofenceService = GeofenceService()
-    route("/geofence/") {
-        route("{id}") {
+    route("/geofence") {
+        route("/add") {
+            post {
+                val geofence = call.receive<ExposedGeofences>()
+
+                val exists = geofenceService.exists(geofence)
+                if (exists.not()) {
+                    val id = geofenceService.create(geofence)
+                    call.respond(HttpStatusCode.Created, id)
+                } else {
+                    call.respond(HttpStatusCode.Conflict, "Geofence for this device already exists")
+                }
+            }
+        }
+        route("/{id}") {
             get {
                 val id = call.parameters["id"]?.toInt()
 
@@ -226,30 +327,21 @@ fun Route.geofences() {
                     if (deviceId != null) {
                         call.respond(HttpStatusCode.OK, deviceId)
                     } else {
-                        call.respond(HttpStatusCode.NotFound)
+                        call.respond(HttpStatusCode.NotFound, "Geofence not found")
                     }
                 } else {
                     call.respond(HttpStatusCode.BadRequest, "Missing 'id' parameter")
                 }
             }
-
             delete {
                 val id = call.parameters["id"]?.toInt()
                 id?.let {
-                    geofenceService.delete(id)
-                    call.respond(HttpStatusCode.OK, "Geofence deleted")
+                    if (geofenceService.delete(id)) {
+                        call.respond(HttpStatusCode.OK, "Geofence deleted")
+                    } else {
+                        call.respond(HttpStatusCode.NotFound, "Geofence not found")
+                    }
                 } ?: call.respond(HttpStatusCode.NotFound, "Invalid ID")
-            }
-        }
-        post {
-            val geofence = call.receive<ExposedGeofences>()
-
-            val exists = geofenceService.getGeofence(geofence.deviceId)
-            if (exists != null) {
-                call.respond(HttpStatusCode.Conflict, "Geofence for this device already exists")
-            } else{
-                val id = geofenceService.create(geofence.deviceId)
-                call.respond(HttpStatusCode.Created, id)
             }
         }
         route("device/{deviceId}") {
@@ -267,6 +359,37 @@ fun Route.geofences() {
                     call.respond(HttpStatusCode.BadRequest, "Missing 'deviceId' parameter")
                 }
             }
+            delete {
+                val deviceId = call.parameters["deviceId"]?.toInt()
+
+                if (deviceId != null) {
+                    val deleted = geofenceService.removeGeofence(deviceId)
+                    if (deleted) {
+                        call.respond(HttpStatusCode.OK, "Geofence deleted")
+                    } else {
+                        call.respond(HttpStatusCode.NotFound, "This device doesn't have a geofence")
+                    }
+                } else {
+                    call.respond(HttpStatusCode.BadRequest, "Missing 'deviceId' parameter")
+                }
+            }
+        }
+        route("deleteAll") {
+            delete {
+                geofenceService.deleteAll()
+                call.respond(HttpStatusCode.OK, "All geofences deleted")
+            }
+        }
+        route("getAll") {
+            get {
+                val geofences = geofenceService.getAll()
+
+                if (geofences.isNotEmpty()) {
+                    call.respond(HttpStatusCode.Found, geofences)
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "Geofences table is empty")
+                }
+            }
         }
     }
 }
@@ -274,8 +397,8 @@ fun Route.geofences() {
 
 fun Route.geofenceVertices() {
     val geofenceVerticesService = GeofenceVerticesService()
-    route("/vertex/") {
-        route("{id}") {
+    route("/vertex") {
+        route("/{id}") {
             get {
                 val id = call.parameters["id"]?.toInt()
 
@@ -294,33 +417,74 @@ fun Route.geofenceVertices() {
             delete {
                 val id = call.parameters["id"]?.toInt()
                 id?.let {
-                    geofenceVerticesService.delete(id)
-                    call.respond(HttpStatusCode.OK, "Geofence vertex deleted")
+                    if (geofenceVerticesService.delete(id)) {
+                        call.respond(HttpStatusCode.OK, "Vertex deleted")
+                    } else {
+                        call.respond(HttpStatusCode.NotFound, "Vertex not found")
+                    }
                 } ?: call.respond(HttpStatusCode.NotFound, "Invalid ID")
             }
         }
-        route("getAll/{geofenceId}") {
-            get {
-                val geofenceId = call.parameters["geofenceId"]?.toInt()
-
-                if (geofenceId != null) {
-                    val vertices = geofenceVerticesService.getAll(geofenceId)
-                    if (vertices.isNotEmpty()) {
-                        call.respond(HttpStatusCode.OK, vertices)
-                    } else {
-                        call.respond(HttpStatusCode.NotFound)
-                    }
-                } else {
-                    call.respond(HttpStatusCode.BadRequest, "Missing 'geofenceId' parameter")
-                }
-            }
-        }
-        route("add") {
+        route("/add") {
             post {
                 val geofenceVertex = call.receive<ExposedGeofenceVertices>()
 
-                val id = geofenceVerticesService.create(geofenceVertex)
-                call.respond(HttpStatusCode.Created, id)
+                val exists = geofenceVerticesService.exists(geofenceVertex)
+                if (exists.not()) {
+                    val id = geofenceVerticesService.create(geofenceVertex)
+                    call.respond(HttpStatusCode.Created, id)
+                } else {
+                    call.respond(HttpStatusCode.Conflict, "Vertex for this geofence already exists")
+                }
+            }
+        }
+        route("/deleteAll") {
+            delete {
+                geofenceVerticesService.deleteAll()
+                call.respond(HttpStatusCode.OK, "All vertices deleted")
+            }
+            route("/{geofenceId}") {
+                delete {
+                    val geofenceId = call.parameters["geofenceId"]?.toInt()
+
+                    if (geofenceId != null) {
+                        val deleted = geofenceVerticesService.deleteAll(geofenceId)
+                        if (deleted) {
+                            call.respond(HttpStatusCode.OK, "All vertices deleted")
+                        } else {
+                            call.respond(HttpStatusCode.NotFound, "This geofence doesn't have any vertices")
+                        }
+                    } else {
+                        call.respond(HttpStatusCode.BadRequest, "Missing 'geofenceId' parameter")
+                    }
+                }
+            }
+        }
+        route("/getAll") {
+            get {
+                val geofenceVertices = geofenceVerticesService.getAll()
+
+                if (geofenceVertices.isNotEmpty()) {
+                    call.respond(HttpStatusCode.Found, geofenceVertices)
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "geofenceVertices table is empty")
+                }
+            }
+            route("/{geofenceId}") {
+                get {
+                    val geofenceId = call.parameters["geofenceId"]?.toInt()
+
+                    if (geofenceId != null) {
+                        val vertices = geofenceVerticesService.getAll(geofenceId)
+                        if (vertices.isNotEmpty()) {
+                            call.respond(HttpStatusCode.OK, vertices)
+                        } else {
+                            call.respond(HttpStatusCode.NotFound, "This geofence doesn't have any vertices")
+                        }
+                    } else {
+                        call.respond(HttpStatusCode.BadRequest, "Missing 'geofenceId' parameter")
+                    }
+                }
             }
         }
     }

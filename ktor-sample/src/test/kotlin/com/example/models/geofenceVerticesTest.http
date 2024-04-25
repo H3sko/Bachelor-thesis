@@ -1,102 +1,44 @@
-###
-POST http://127.0.0.1:8080/geofece/add
+POST http://127.0.0.1:8080/vertex/add
 Content-Type: application/json
 
 {
-  "id": 1,
-  "geofenceId": 1,
+  "geofenceId": 2,
   "latitude": "40.7128",
   "longitude": "-74.0060"
 }
 
 ###
-POST http://127.0.0.1:8080/geofece/add
+POST http://127.0.0.1:8080/vertex/add
 Content-Type: application/json
 
 {
-  "id": 2,
-  "geofenceId": 1,
+  "geofenceId": 3,
   "latitude": "40.7129",
   "longitude": "-74.0061"
 }
 
 ###
-POST http://127.0.0.1:8080/geofece/add
+POST http://127.0.0.1:8080/vertex/add
 Content-Type: application/json
 
 {
-  "id": 3,
-  "geofenceId": 1,
+  "geofenceId": 3,
   "latitude": "40.7130",
   "longitude": "-74.0062"
 }
 
 ###
-POST http://127.0.0.1:8080/geofece/add
+POST http://127.0.0.1:8080/vertex/add
 Content-Type: application/json
 
 {
-  "id": 4,
   "geofenceId": 1,
   "latitude": "40.7131",
   "longitude": "-74.0063"
 }
 
 ###
-POST http://127.0.0.1:8080/geofece/add
-Content-Type: application/json
-
-{
-  "id": 5,
-  "geofenceId": 2,
-  "latitude": "34.0522",
-  "longitude": "-118.2437"
-}
-
-###
-POST http://127.0.0.1:8080/geofece/add
-Content-Type: application/json
-
-{
-  "id": 6,
-  "geofenceId": 2,
-  "latitude": "34.0523",
-  "longitude": "-118.2438"
-}
-
-###
-POST http://127.0.0.1:8080/geofece/add
-Content-Type: application/json
-
-{
-  "id": 7,
-  "geofenceId": 2,
-  "latitude": "34.0524",
-  "longitude": "-118.2439"
-}
-
-###
-GET http://127.0.0.1:8080/geofece/getAll/1
-Content-Type: application/json
-
-###
-GET http://127.0.0.1:8080/geofece/getAll/2
-Content-Type: application/json
-
-###
 GET http://127.0.0.1:8080/vertex/1
-Content-Type: application/json
-
-###
-GET http://127.0.0.1:8080/vertex/3
-Content-Type: application/json
-
-###
-GET http://127.0.0.1:8080/vertex/5
-Content-Type: application/json
-
-###
-GET http://127.0.0.1:8080/vertex/7
 Content-Type: application/json
 
 ###
@@ -104,5 +46,17 @@ DELETE http://127.0.0.1:8080/vertex/1
 Content-Type: application/json
 
 ###
-DELETE http://127.0.0.1:8080/vertex/7
+GET http://127.0.0.1:8080/vertex/getAll
+Content-Type: application/json
+
+###
+DELETE http://127.0.0.1:8080/vertex/deleteAll
+Content-Type: application/json
+
+###
+GET http://127.0.0.1:8080/vertex/getAll/2
+Content-Type: application/json
+
+###
+DELETE http://127.0.0.1:8080/vertex/deleteAll/2
 Content-Type: application/json

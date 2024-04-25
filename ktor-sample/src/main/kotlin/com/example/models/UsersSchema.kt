@@ -17,15 +17,42 @@ class UserService {
         }
     }
 
+
+    suspend fun getAllUsers(): List<List<String>> {
+        return dbQuery {
+            Users.selectAll().map {
+                    listOf( it[Users.id].toString(),
+                    it[Users.loginEmail],
+                    it[Users.password])
+            }
+        }
+    }
+
+
+    suspend fun deleteAllUsers() {
+        dbQuery {
+            Users.deleteAll()
+        }
+    }
+
+
     suspend fun login(user: ExposedUsers): Boolean = dbQuery {
         Users.selectAll()
             .where { (Users.loginEmail eq user.loginEmail) and (Users.password eq user.password) }
-            .count() > 0
+            .count().toInt() > 0
     }
 
-    suspend fun exists(loginEmail: String): Boolean = dbQuery {
-        Users.selectAll().where { Users.loginEmail eq loginEmail }
-            .count() > 0
+
+    suspend fun exists(loginEmail: String): ExposedUsers? {
+        return dbQuery {
+            Users.selectAll().where { Users.loginEmail eq loginEmail }
+                .map {
+                    ExposedUsers(
+                        it[Users.loginEmail],
+                        it[Users.password]
+                    )
+                }.singleOrNull()
+        }
     }
 
 
@@ -41,7 +68,6 @@ class UserService {
         return dbQuery {
             Users.selectAll().where { Users.id eq id }
                 .map { ExposedUsers(
-                        it[Users.id].value,
                         it[Users.loginEmail],
                         it[Users.password]
                     )
@@ -49,19 +75,20 @@ class UserService {
         }
     }
 
-    suspend fun update(id: Int, loginEmail: String, hashedPassword: String) {
+    suspend fun update(oldLoginEmail: String, oldPassword: String, newLoginEmail: String, newPassword: String) {
         dbQuery {
-            Users.update({ Users.id eq id }) {
-                it[Users.loginEmail] = loginEmail
-                it[Users.password] = hashedPassword
+            Users.update({ ( Users.loginEmail eq oldLoginEmail ) and ( Users.password eq oldPassword )}) {
+                it[loginEmail] = newLoginEmail
+                it[password] = newPassword
             }
         }
     }
 
 
-    suspend fun delete(id: Int) {
-        dbQuery {
-            Users.deleteWhere { Users.id.eq(id) }
+    suspend fun delete(id: Int): Boolean {
+        return dbQuery {
+            val deletedUsers = Users.deleteWhere { Users.id eq id }
+            deletedUsers > 0
         }
     }
 }

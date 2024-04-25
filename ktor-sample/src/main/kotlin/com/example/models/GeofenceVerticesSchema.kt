@@ -14,17 +14,55 @@ class GeofenceVerticesService {
         }
     }
 
+    suspend fun getAll(): List<List<String>> {
+        return dbQuery {
+            GeofenceVertices.selectAll()
+                .map {
+                    listOf(
+                        it[GeofenceVertices.id].toString(),
+                        it[GeofenceVertices.geofenceId].toString(),
+                        it[GeofenceVertices.latitude],
+                        it[GeofenceVertices.longitude],
+                    )
+                }
+        }
+    }
+
+
     suspend fun getAll(geofenceId: Int): List<ExposedGeofenceVertices> {
         return dbQuery {
             GeofenceVertices.selectAll().where { GeofenceVertices.geofenceId eq geofenceId }
                 .map {
                     ExposedGeofenceVertices(
-                        it[GeofenceVertices.id].value,
                         it[GeofenceVertices.geofenceId].value,
                         it[GeofenceVertices.latitude],
                         it[GeofenceVertices.longitude]
                     )
                 }
+        }
+    }
+
+
+    suspend fun deleteAll() {
+        dbQuery {
+            GeofenceVertices.deleteAll()
+        }
+    }
+
+
+    suspend fun deleteAll(geofenceId: Int): Boolean {
+        return dbQuery {
+            val deletedRowCount = GeofenceVertices.deleteWhere { GeofenceVertices.geofenceId eq geofenceId }
+            deletedRowCount > 0
+        }
+    }
+
+
+    suspend fun exists(geofenceVertex: ExposedGeofenceVertices): Boolean {
+        return dbQuery {
+            GeofenceVertices.selectAll()
+                .where { (GeofenceVertices.geofenceId eq geofenceVertex.geofenceId) and (GeofenceVertices.latitude eq geofenceVertex.latitude) and (GeofenceVertices.longitude eq geofenceVertex.longitude) }
+                .count() > 0
         }
     }
 
@@ -42,7 +80,6 @@ class GeofenceVerticesService {
         return dbQuery {
             GeofenceVertices.selectAll().where { GeofenceVertices.id eq id }
                 .map { ExposedGeofenceVertices(
-                    it[GeofenceVertices.id].value,
                     it[GeofenceVertices.geofenceId].value,
                     it[GeofenceVertices.latitude],
                     it[GeofenceVertices.longitude]
@@ -51,19 +88,11 @@ class GeofenceVerticesService {
         }
     }
 
-    suspend fun update(geofencevertex: ExposedGeofenceVertices) {
-        dbQuery {
-            GeofenceVertices.update({ GeofenceVertices.id eq geofencevertex.id }) {
-                it[geofenceId] = EntityID(geofencevertex.geofenceId, GeofenceVertices)
-                it[latitude] = geofencevertex.latitude
-                it[longitude] = geofencevertex.longitude
-            }
-        }
-    }
 
-    suspend fun delete(id: Int) {
-        dbQuery {
-            GeofenceVertices.deleteWhere { GeofenceVertices.id.eq(id) }
+    suspend fun delete(id: Int): Boolean {
+        return dbQuery {
+            val deletedGeofenceVertices = GeofenceVertices.deleteWhere { GeofenceVertices.id eq id }
+            deletedGeofenceVertices > 0
         }
     }
 }

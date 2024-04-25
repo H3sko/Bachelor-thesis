@@ -14,12 +14,42 @@ class DeviceService {
         }
     }
 
+
+    suspend fun getAllDevices(): List<List<String>> {
+        return dbQuery {
+            Devices.selectAll()
+                .map {
+                    listOf(
+                        it[Devices.id].toString(),
+                        it[Devices.userId].toString(),
+                        it[Devices.name]
+                    )
+                }
+        }
+    }
+
+
+    suspend fun deleteAllDevices() {
+        dbQuery {
+            Devices.deleteAll()
+        }
+    }
+
+
+    suspend fun exists(device: ExposedDevices): Boolean {
+        return dbQuery {
+            Devices.selectAll()
+                .where { (Devices.userId eq EntityID(device.userId, Devices)) and (Devices.name eq device.name) }
+                .count() > 0
+        }
+    }
+
+
     suspend fun getAll(userId: Int): List<ExposedDevices> {
         return dbQuery {
             Devices.selectAll().where { Devices.userId eq userId }
                 .map {
                     ExposedDevices(
-                        it[Devices.id].value,
                         it[Devices.userId].value,
                         it[Devices.name]
                     )
@@ -40,7 +70,6 @@ class DeviceService {
             Devices.selectAll().where { Devices.id eq id }
                 .map {
                     ExposedDevices(
-                        it[Devices.id].value,
                         it[Devices.userId].value,
                         it[Devices.name]
                     )
@@ -48,18 +77,12 @@ class DeviceService {
         }
     }
 
-    suspend fun update(device: ExposedDevices) {
-        dbQuery {
-            Devices.update({ Devices.id eq device.id }) {
-                it[userId] = EntityID(device.userId, Devices)
-                it[name] = device.name
-            }
+
+    suspend fun delete(id: Int): Boolean {
+        return dbQuery {
+            val deletedRows = Devices.deleteWhere { Devices.id eq id }
+            deletedRows > 0
         }
     }
 
-    suspend fun delete(id: Int) {
-        dbQuery {
-            Devices.deleteWhere { Devices.id eq id }
-        }
-    }
 }

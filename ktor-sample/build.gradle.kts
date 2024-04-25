@@ -44,7 +44,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.0")
     implementation("com.zaxxer:HikariCP:5.0.1")
 
-    implementation("org.jetbrains.exposed:exposed:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed:0.17.14")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-crypt:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")

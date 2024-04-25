@@ -2,117 +2,35 @@ POST http://127.0.0.1:8080/device/add
 Content-Type: application/json
 
 {
-  "id": 100,
-  "userId": 1,
-  "name": "Airtag 1"
-}
-
-###
-POST http://127.0.0.1:8080/device/add
-Content-Type: application/json
-
-{
-  "id": 101,
-  "userId": 1,
-  "name": "Airtag 7"
-}
-
-###
-POST http://127.0.0.1:8080/device/add
-Content-Type: application/json
-
-{
-  "id": 102,
-  "userId": 1,
-  "name": "Airtag 43"
-}
-
-###
-POST http://127.0.0.1:8080/device/add
-Content-Type: application/json
-
-{
-  "id": 103,
-  "userId": 2,
-  "name": "Airtag 1"
-}
-
-###
-POST http://127.0.0.1:8080/device/add
-Content-Type: application/json
-
-{
-  "id": 104,
-  "userId": 2,
-  "name": "Airtag 15"
-}
-
-###
-POST http://127.0.0.1:8080/device/add
-Content-Type: application/json
-
-{
-  "id": 105,
   "userId": 3,
-  "name": "Airtag 16"
+  "name": "Airtag 3"
 }
 
 ###
-GET http://127.0.0.1:8080/device/getAll/1
+POST http://127.0.0.1:8080/device/add
+Content-Type: application/json
+
+{
+  "userId": 14,
+  "name": "Airtag 2"
+}
+
+###
+GET http://127.0.0.1:8080/device/getAll/14
 Content-Type: application/json
 
 ###
-GET http://127.0.0.1:8080/device/getAll/2
+GET http://127.0.0.1:8080/device/15
 Content-Type: application/json
 
 ###
-GET http://127.0.0.1:8080/device/getAll/3
+DELETE http://127.0.0.1:8080/device/16
 Content-Type: application/json
 
 ###
-GET http://127.0.0.1:8080/device/100
+GET http://127.0.0.1:8080/device/getAll
 Content-Type: application/json
 
 ###
-GET http://127.0.0.1:8080/device/101
-Content-Type: application/json
-
-###
-GET http://127.0.0.1:8080/device/102
-Content-Type: application/json
-
-###
-GET http://127.0.0.1:8080/device/103
-Content-Type: application/json
-
-###
-GET http://127.0.0.1:8080/device/104
-Content-Type: application/json
-
-###
-GET http://127.0.0.1:8080/device/105
-Content-Type: application/json
-
-###
-DELETE http://127.0.0.1:8080/device/100
-Content-Type: application/json
-
-###
-DELETE http://127.0.0.1:8080/device/101
-Content-Type: application/json
-
-###
-DELETE http://127.0.0.1:8080/device/102
-Content-Type: application/json
-
-###
-DELETE http://127.0.0.1:8080/device/103
-Content-Type: application/json
-
-###
-DELETE http://127.0.0.1:8080/device/104
-Content-Type: application/json
-
-###
-DELETE http://127.0.0.1:8080/device/105
+DELETE http://127.0.0.1:8080/device/deleteAll
 Content-Type: application/json

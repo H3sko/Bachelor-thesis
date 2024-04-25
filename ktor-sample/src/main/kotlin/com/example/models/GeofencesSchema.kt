@@ -13,6 +13,27 @@ class GeofenceService {
         }
     }
 
+
+    suspend fun getAll(): List<List<String>> {
+        return dbQuery {
+            Geofences.selectAll()
+                .map {
+                    listOf(
+                        it[Geofences.id].toString(),
+                        it[Geofences.deviceId].toString()
+                    )
+                }
+        }
+    }
+
+
+    suspend fun deleteAll() {
+        dbQuery {
+            Geofences.deleteAll()
+        }
+    }
+
+
     suspend fun getGeofence(deviceId: Int): Int? {
         return dbQuery {
             Geofences.selectAll().where { Geofences.deviceId eq deviceId }
@@ -21,36 +42,45 @@ class GeofenceService {
         }
     }
 
-    suspend fun create(deviceId: Int): Int = dbQuery {
-        Geofences.insertAndGetId {
-            it[GeofenceVertices.geofenceId] = EntityID(deviceId, Geofences)
-        }.value
+    suspend fun exists(geofence: ExposedGeofences): Boolean {
+        return dbQuery {
+            Geofences.selectAll()
+                .where { Geofences.deviceId eq geofence.deviceId }
+                .count() > 0
+        }
     }
 
+
+    suspend fun create(geofence: ExposedGeofences): Int = dbQuery {
+        Geofences.insertAndGetId {
+            it[deviceId] = EntityID(geofence.deviceId, Geofences)
+        }.value
+    }
 
 
     suspend fun read(id: Int): ExposedGeofences? {
         return dbQuery {
             Geofences.selectAll().where { Geofences.id eq id }
                 .map { ExposedGeofences(
-                    it[Geofences.id].value,
-                    it[Geofences.deviceId].value,
+                    it[Geofences.deviceId].value
                 )
                 }.singleOrNull()
         }
     }
 
-    suspend fun update(id: Int, geofence: ExposedGeofences) {
-        dbQuery {
-            Geofences.update({ Geofences.id eq id }) {
-                it[deviceId] = EntityID(geofence.deviceId, Geofences)
-            }
+
+    suspend fun delete(id: Int): Boolean {
+        return dbQuery {
+            val deletedGeofences = Geofences.deleteWhere { Geofences.id eq id }
+            deletedGeofences > 0
         }
     }
 
-    suspend fun delete(id: Int) {
-        dbQuery {
-            Geofences.deleteWhere { Geofences.id.eq(id) }
+
+    suspend fun removeGeofence(deviceId: Int): Boolean {
+        return dbQuery {
+            val deletedGeofences = Geofences.deleteWhere { Geofences.deviceId eq deviceId }
+            deletedGeofences > 0
         }
     }
 }

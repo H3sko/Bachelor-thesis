@@ -10,7 +10,4 @@ fun Application.configureSerialization() {
     install(ContentNegotiation) {
         json()
     }
-    routing {
-
-    }
 }
