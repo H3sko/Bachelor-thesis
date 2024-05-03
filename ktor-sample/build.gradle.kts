@@ -40,7 +40,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
-
+    implementation("io.ktor:ktor-server-auth:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("org.postgresql:postgresql:42.7.0")
     implementation("com.zaxxer:HikariCP:5.0.1")
 

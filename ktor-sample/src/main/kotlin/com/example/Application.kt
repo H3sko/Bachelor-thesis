@@ -1,13 +1,11 @@
 package com.example
 
+import com.example.jwt.JWTService
 import com.example.plugins.*
-import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.ktor.server.plugins.defaultheaders.*
-import io.ktor.server.routing.*
-import io.ktor.server.response.*
+
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "127.0.0.1", module = Application::module)
@@ -18,5 +16,8 @@ fun Application.module() {
     configureHTTP()
     configureSerialization()
     configureDatabases()
-    configureRouting()
+    val jwtService = JWTService(this)
+
+    configureAuthentication(jwtService)
+    configureRouting(jwtService)
 }

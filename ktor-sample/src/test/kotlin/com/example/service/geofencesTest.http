@@ -1,0 +1,45 @@
+POST http://127.0.0.1:8080/geofence/add
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNDY2OTEwMX0.N8tAEyYuNep99-a6qeFMI1FSM4pN4JripmyJrqhUKUI
+
+{
+  "deviceId": 8
+}
+
+###
+GET http://127.0.0.1:8080/geofence/device
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNDY2OTEwMX0.N8tAEyYuNep99-a6qeFMI1FSM4pN4JripmyJrqhUKUI
+
+{
+  "deviceId": 8
+}
+
+###
+DELETE http://127.0.0.1:8080/geofence/device
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNDY2OTEwMX0.N8tAEyYuNep99-a6qeFMI1FSM4pN4JripmyJrqhUKUI
+
+{
+  "deviceId": 7
+}
+
+###
+GET http://127.0.0.1:8080/geofence/3
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTQ2NjA1NTV9.sz4ycqjliI8R5w1q74Vg7-KS1588bVnPOFPNDqOF_aM
+
+###
+DELETE http://127.0.0.1:8080/geofence/3
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTQ2NjA1NTV9.sz4ycqjliI8R5w1q74Vg7-KS1588bVnPOFPNDqOF_aM
+
+###
+GET http://127.0.0.1:8080/geofence/getAll
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTQ2NjA1NTV9.sz4ycqjliI8R5w1q74Vg7-KS1588bVnPOFPNDqOF_aM
+
+###
+DELETE http://127.0.0.1:8080/geofence/deleteAll
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTQ2NjA1NTV9.sz4ycqjliI8R5w1q74Vg7-KS1588bVnPOFPNDqOF_aM
