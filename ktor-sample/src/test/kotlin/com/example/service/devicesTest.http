@@ -1,19 +1,16 @@
 POST http://127.0.0.1:8080/device/add
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNDY2OTEwMX0.N8tAEyYuNep99-a6qeFMI1FSM4pN4JripmyJrqhUKUI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTI4NTIxMX0.5Jp6tj-r49wJRfV_3UYs2VnPAl6ktZHBF40ruC0rw_k
 
 {
-  "name": "Airtag 2"
+  "name": "Michal’s Backpack",
+  "owner": "owner@localhost"
 }
 
 ###
-DELETE http://127.0.0.1:8080/device/remove
+DELETE http://127.0.0.1:8080/device/remove/1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNDY2OTEwMX0.N8tAEyYuNep99-a6qeFMI1FSM4pN4JripmyJrqhUKUI
-
-{
-  "name": "Airtag 3"
-}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTI4NTIxMX0.5Jp6tj-r49wJRfV_3UYs2VnPAl6ktZHBF40ruC0rw_k
 
 ###
 GET http://127.0.0.1:8080/device/getUserDevices

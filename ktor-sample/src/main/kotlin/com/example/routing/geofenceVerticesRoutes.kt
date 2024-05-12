@@ -27,7 +27,7 @@ fun Route.geofenceVerticesDefault(jwtService: JWTService) {
                     ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
                 val userId = username?.let { it1 -> userService.getUserId(it1) }
                 val geofence = geofenceService.read(geofenceVertex.geofenceId)
-                val device = geofence?.let { it1 -> deviceService.read(it1.deviceId) }
+                val device = geofence?.let { it1 -> deviceService.readById(it1.deviceId) }
 
                 if (device != null) {
                     if (device.userId == userId) {
@@ -53,7 +53,7 @@ fun Route.geofenceVerticesDefault(jwtService: JWTService) {
                     ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
                 val userId = username?.let { it1 -> userService.getUserId(it1) }
                 val geofence = geofenceService.read(geofenceId)
-                val device = geofence?.let { it1 -> deviceService.read(it1.deviceId) }
+                val device = geofence?.let { it1 -> deviceService.readById(it1.deviceId) }
 
                 if (device != null) {
                     if (device.userId == userId) {
@@ -78,7 +78,7 @@ fun Route.geofenceVerticesDefault(jwtService: JWTService) {
                     ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
                 val userId = username?.let { it1 -> userService.getUserId(it1) }
                 val geofence = geofenceService.read(geofenceId)
-                val device = geofence?.let { it1 -> deviceService.read(it1.deviceId) }
+                val device = geofence?.let { it1 -> deviceService.readById(it1.deviceId) }
 
                 if (device != null) {
                     if (device.userId == userId) {

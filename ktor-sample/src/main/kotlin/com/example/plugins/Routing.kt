@@ -18,6 +18,11 @@ fun Application.configureRouting(jwtService: JWTService) {
     }
 
     routing {
+        route("/"){
+            get {
+                call.respond(HttpStatusCode.OK, "Working")
+            }
+        }
         usersDefault(jwtService)
         authenticate("auth-user") {
             devicesDefault(jwtService)

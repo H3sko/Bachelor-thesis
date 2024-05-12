@@ -5,20 +5,22 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ExposedUsers(
     val username: String,
-    val password: String,
+    val passwordHash: String,
+    val salt: ByteArray
 )
 
 @Serializable
 data class ExposedDevices(
     val userId: Int,
-    val name: String
+    val name: String,
+    val serialNumber: String
 )
 
 @Serializable
 data class ExposedLocations(
     val deviceId: Int,
-    val latitude: String,
-    val longitude: String,
+    val latitude: Double,
+    val longitude: Double,
     val timestamp: String
 )
 
@@ -30,8 +32,8 @@ data class ExposedGeofences(
 @Serializable
 data class ExposedGeofenceVertices(
     val geofenceId: Int,
-    val latitude: String,
-    val longitude: String
+    val latitude: Double,
+    val longitude: Double
 )
 
 @Serializable
@@ -42,11 +44,49 @@ data class PasswordChangeRequest(
 )
 
 @Serializable
-data class DeviceNameRequest(val name: String)
+data class ExposedDeviceResponse(
+    val id: Int,
+    val userId: Int,
+    val name: String,
+    val serialNumber: String
+)
 
 @Serializable
-data class DeviceLocationRequest(val deviceId: Int)
+data class UserCredentialsRequest(val username: String, val passwordHash: String)
+
+@Serializable
+data class UserRequest(val username: String, val password: String)
+
+@Serializable
+data class DeviceCredentials(val name: String, val owner: String)
 
 @Serializable
 data class GeofenceVertexRequest(val geofenceId: Int)
-   
+
+@Serializable
+data class GeofenceVertex(
+    val latitude: Double,
+    val longitude: Double
+)
+
+@Serializable
+data class GeofenceResponse(
+    val geofenceId: Int,
+    val vertices: List<GeofenceVertex>
+)
+
+@Serializable
+data class LocationDto(
+    val latitude: Double,
+    val longitude: Double,
+    val timestamp: String
+)
+
+@Serializable
+data class LocationWithId(
+    val id: Int,
+    val deviceId: Int,
+    val latitude: Double,
+    val longitude: Double,
+    val timestamp: String
+)

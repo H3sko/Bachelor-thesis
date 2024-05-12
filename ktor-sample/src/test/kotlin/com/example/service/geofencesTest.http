@@ -1,28 +1,22 @@
-POST http://127.0.0.1:8080/geofence/add
+POST http://127.0.0.1:8080/geofence/add/2
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNDY2OTEwMX0.N8tAEyYuNep99-a6qeFMI1FSM4pN4JripmyJrqhUKUI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTI4MzkzOH0.nXKEungsNxaK6UJnO-z46YSdaBALYqCZLW6cs3_5O44
 
-{
-  "deviceId": 8
-}
+[
+  {"latitude":40.1,"longitude":-74.1},
+  {"latitude":40.3,"longitude":-74.3},
+  {"latitude":40.5,"longitude":-74.5}
+]
 
 ###
-GET http://127.0.0.1:8080/geofence/device
+GET http://127.0.0.1:8080/geofence/device/2
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNDY2OTEwMX0.N8tAEyYuNep99-a6qeFMI1FSM4pN4JripmyJrqhUKUI
-
-{
-  "deviceId": 8
-}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTI4NTIxMX0.5Jp6tj-r49wJRfV_3UYs2VnPAl6ktZHBF40ruC0rw_k
 
 ###
-DELETE http://127.0.0.1:8080/geofence/device
+DELETE http://127.0.0.1:8080/geofence/delete/device/2
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNDY2OTEwMX0.N8tAEyYuNep99-a6qeFMI1FSM4pN4JripmyJrqhUKUI
-
-{
-  "deviceId": 7
-}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTI4NTIxMX0.5Jp6tj-r49wJRfV_3UYs2VnPAl6ktZHBF40ruC0rw_k
 
 ###
 GET http://127.0.0.1:8080/geofence/3
@@ -32,7 +26,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwia
 ###
 DELETE http://127.0.0.1:8080/geofence/3
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTQ2NjA1NTV9.sz4ycqjliI8R5w1q74Vg7-KS1588bVnPOFPNDqOF_aM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTI4Mjc2MH0.YwLgOScAE7tnvOHQ0w8MhKD3lyM2NH3fv3L2hjpboig
 
 ###
 GET http://127.0.0.1:8080/geofence/getAll
@@ -42,4 +36,4 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwia
 ###
 DELETE http://127.0.0.1:8080/geofence/deleteAll
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTQ2NjA1NTV9.sz4ycqjliI8R5w1q74Vg7-KS1588bVnPOFPNDqOF_aM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTUyODMwMDV9.uo-V6fp_NdJQRz2GhwyNEl341Dm-cZVRPj86-yzZUek

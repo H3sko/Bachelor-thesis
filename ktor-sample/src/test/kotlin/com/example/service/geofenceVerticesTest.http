@@ -49,13 +49,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwia
 {
   "geofenceId": 6
 }
+
 ###
 DELETE http://127.0.0.1:8080/vertex/deleteAll
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNDY2OTEwMX0.N8tAEyYuNep99-a6qeFMI1FSM4pN4JripmyJrqhUKUI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTI4MDQ3M30.hy2VNxEavHossbFJDB7hIp0jZYLcGNvaK87W8xp3_e8
 
 {
-  "geofenceId": 6
+  "geofenceId": 1
 }
 
 ###

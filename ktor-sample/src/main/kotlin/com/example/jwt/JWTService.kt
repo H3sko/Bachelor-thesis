@@ -4,8 +4,9 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
-import com.example.models.ExposedUsers
+import com.example.models.UserRequest
 import com.example.service.UserService
+import com.example.utils.sha256WithSalt
 import io.ktor.server.application.*
 import io.ktor.server.auth.jwt.*
 import java.util.*
@@ -28,18 +29,22 @@ class JWTService(
             .withIssuer(issuer)
             .build()
 
-    suspend fun createJwtToken(user: ExposedUsers): String? {
-        val found = userService.exists(user)
+    suspend fun createJwtToken(user: UserRequest): String? {
+        val exposedUser = userService.getUser(user.username)
 
-        return if (found) {
-            JWT
-                .create()
-                .withAudience(audience)
-                .withIssuer(issuer)
-                .withClaim("username", user.username)
-                .withExpiresAt(Date(System.currentTimeMillis() + 3_600_000_000_000_000_000)) // TODO: zmenit len na 3_600_000
-                .sign(Algorithm.HMAC256(secret))
-        } else null
+        if (exposedUser != null) {
+            val passwordHash = sha256WithSalt(user.password, exposedUser.salt)
+            if (passwordHash == exposedUser.passwordHash) {
+                return JWT
+                    .create()
+                    .withAudience(audience)
+                    .withIssuer(issuer)
+                    .withClaim("username", user.username)
+                    .withExpiresAt(Date(System.currentTimeMillis() + 3_600_000_000_000_000_000))
+                    .sign(Algorithm.HMAC256(secret))
+            }
+        }
+        return null
     }
 
     suspend fun adminValidator(credential: JWTCredential): JWTPrincipal? {
@@ -63,7 +68,7 @@ class JWTService(
     }
 
 
-    suspend fun extractUsernameFromToken(token: String): String? {
+    fun extractUsernameFromToken(token: String): String? {
         val payload = createJWTCredential(token)
         val username = extractUsername(payload)
 

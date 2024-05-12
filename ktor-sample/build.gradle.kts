@@ -44,6 +44,10 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("org.postgresql:postgresql:42.7.0")
     implementation("com.zaxxer:HikariCP:5.0.1")
+    implementation("org.quartz-scheduler:quartz:2.3.2")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
+
 
     implementation("org.jetbrains.exposed:exposed:0.17.14")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")

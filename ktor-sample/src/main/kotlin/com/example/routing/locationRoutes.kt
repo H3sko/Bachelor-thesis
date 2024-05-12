@@ -1,8 +1,8 @@
 package com.example.routing
 
 import com.example.jwt.JWTService
-import com.example.models.DeviceLocationRequest
 import com.example.models.ExposedLocations
+import com.example.models.LocationDto
 import com.example.service.DeviceService
 import com.example.service.LocationsService
 import com.example.service.UserService
@@ -18,27 +18,63 @@ fun Route.locationsDefault(jwtService: JWTService) {
     val userService = UserService()
     val deviceService = DeviceService()
     route("/location") {
-        route("/getLatest") {
+        route("/getLatest/{deviceId}") {
             get {
-                val deviceId = call.receive<DeviceLocationRequest>().deviceId
+                val deviceId = call.parameters["deviceId"]?.toInt()
                 val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
                     ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
                 val userId = username?.let { it1 -> userService.getUserId(it1) }
-                val device = deviceService.read(deviceId)
+                val device = deviceId?.let { it1 -> deviceService.readById(deviceId) }
 
                 if (device != null) {
                     if (device.userId == userId) {
                         val location = locationsService.getLatest(deviceId)
                         if (location != null) {
-                            call.respond(HttpStatusCode.OK, location)
+                            val locationDto = LocationDto(
+                                    latitude = location.latitude,
+                                    longitude = location.longitude,
+                                    timestamp = location.timestamp
+                                )
+                            call.respond(HttpStatusCode.OK, locationDto)
                         } else {
-                            call.respond(HttpStatusCode.NotFound, "Device $deviceId doesn't have any locations")
+                            call.respond(HttpStatusCode.Conflict, "Device $deviceId doesn't have any locations")
                         }
                     } else {
                         call.respond(HttpStatusCode.Unauthorized, "Device $deviceId belongs to a different user")
                     }
                 } else {
                     call.respond(HttpStatusCode.NotFound, "Device $deviceId doesn't exist")
+                }
+            }
+        }
+        route("/getAll/{deviceId}") {
+            get {
+                val deviceId = call.parameters["deviceId"]?.toInt()
+                val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+                    ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
+                val userId = username?.let { it1 -> userService.getUserId(it1) }
+                val device = deviceId?.let { it1 -> deviceService.readById(it1) }
+
+                if (device != null) {
+                    if (device.userId == userId) {
+                        val locations = locationsService.getAll(deviceId)
+                        if (locations.isNotEmpty()) {
+                            val locationDtos: List<LocationDto> = locations.map { loc ->
+                                LocationDto(
+                                    latitude = loc.latitude,
+                                    longitude = loc.longitude,
+                                    timestamp = loc.timestamp
+                                )
+                            }
+                            call.respond(HttpStatusCode.OK, locationDtos)
+                        } else {
+                            call.respond(HttpStatusCode.Conflict, "This device doesn't have any locations")
+                        }
+                    } else {
+                        call.respond(HttpStatusCode.Unauthorized, "Device $deviceId belongs to a different user")
+                    }
+                } else {
+                    call.respond(HttpStatusCode.BadRequest, "Missing 'deviceId' parameter")
                 }
             }
         }
@@ -132,7 +168,7 @@ fun Route.locationsAdmin() {
                 if (locations.isNotEmpty()) {
                     call.respond(HttpStatusCode.Found, locations)
                 } else {
-                    call.respond(HttpStatusCode.NotFound, "Devices table is empty")
+                    call.respond(HttpStatusCode.NotFound, "Locations table is empty")
                 }
             }
         }
