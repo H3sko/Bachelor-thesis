@@ -55,6 +55,15 @@ android {
     }
 }
 
+secrets {
+    propertiesFileName = "secrets.properties"
+
+    defaultPropertiesFileName = "local.defaults.properties"
+
+    ignoreList.add("keyToIgnore")
+    ignoreList.add("sdk.*")
+}
+
 kotlin {
     sourceSets {
         debug {
@@ -120,8 +129,6 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
 
     //Navigation
-//    implementation("io.github.raamcosta.compose-destinations:core:1.10.2")
-//    kapt("io.github.raamcosta.compose-destinations:ksp:1.10.2")
     implementation("io.github.raamcosta.compose-destinations:core:1.11.4-alpha")
     ksp("io.github.raamcosta.compose-destinations:ksp:1.11.4-alpha")
 

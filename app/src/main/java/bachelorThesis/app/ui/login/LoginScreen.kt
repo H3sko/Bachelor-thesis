@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import bachelorThesis.app.ui.destinations.HomeScreenDestination
+import bachelorThesis.app.ui.destinations.MapScreenDestination
 import bachelorThesis.app.ui.destinations.RegistrationScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -81,10 +82,12 @@ fun LoginScreen(
         }
     ) {
         if (state.success) {
-            SuccessfulLogin(
-                navigator,
-                viewModel::logOut
-            )
+            navigator.navigate(MapScreenDestination())
+            // TODO: len na testovanie loginu
+//            SuccessfulLogin(
+//                navigator,
+//                viewModel::logOut
+//            )
         } else {
             LoginScreenContent(
                 state,

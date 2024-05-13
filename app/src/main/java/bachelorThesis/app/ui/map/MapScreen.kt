@@ -4,7 +4,6 @@ package bachelorThesis.app.ui.map
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,19 +12,27 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +52,7 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberMarkerState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -71,57 +79,109 @@ fun MapScreen(
 //        }
     }
 
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-        topBar = {
-            MapScreenTopBar(
-                popNavBackStackCallback = { navigator.popBackStack() },
-                name = state.deviceName,
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        gesturesEnabled = true,
+        drawerContent = {
+            ModalDrawerContent(
+                modifier = Modifier,
+                closeDrawer = { localCoroutineScope.launch { drawerState.close() } }
             )
-        },
-        floatingActionButton = {
-            Column {
-                FloatingActionButton(
-                    onClick = {
-                        if(state.locationHistory.isNotEmpty()) viewModel.setLocationHistory(emptyList())
-                        else viewModel.getAllLocationsFromDb()
-                    },
-                    Modifier.background( color =  if (state.locationHistory.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary)
-                ) {
-                    Icon(
-                        painter = painterResource(id = IconResource.Route.id ),
-                        contentDescription = "polyline_icon"
-                    )
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                FloatingActionButton(
-                    onClick = {
-                        localCoroutineScope.launch { viewModel.updateCameraPosition() }
-                    },
-                    Modifier.background( color = MaterialTheme.colorScheme.primary)
-                ) {
-                    Icon(
-                        painter = painterResource(id = IconResource.Place.id ),
-                        contentDescription = "center_icon",
-                    )
-                }
-            }
         }
     ) {
-        MapScreenContent(
-            state,
+        Scaffold(
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState)
+            },
+            topBar = {
+                MapScreenTopBar(
+                    localCoroutineScope,
+                    drawerState,
+                    name = state.deviceName
+                )
+            },
+            floatingActionButton = {
+                Column {
+                    FloatingActionButton(
+                        onClick = {
+                            if(state.locationHistory.isNotEmpty()) viewModel.setLocationHistory(emptyList())
+                            else viewModel.getAllLocationsFromDb()
+                        },
+                        Modifier.background( color =  if (state.locationHistory.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = IconResource.Route.id ),
+                            contentDescription = "polyline_icon"
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    FloatingActionButton(
+                        onClick = {
+                            localCoroutineScope.launch { viewModel.updateCameraPosition() }
+                        },
+                        Modifier.background( color = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = IconResource.Place.id ),
+                            contentDescription = "center_icon",
+                        )
+                    }
+                }
+            }
         ) {
-            localCoroutineScope.launch { viewModel.updateCameraPosition() }
+            MapScreenContent(
+                state
+            ) {
+                localCoroutineScope.launch { viewModel.updateCameraPosition() }
+            }
         }
     }
+
 }
 
 @Composable
+fun ModalDrawerContent(
+    modifier: Modifier,
+    closeDrawer: () -> Unit
+) {
+    ModalDrawerSheet(modifier = modifier) {
+        NavigationDrawerItem(
+            onClick = {
+                closeDrawer()
+            },
+            icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
+            label = {},
+            selected = false
+        )
+        HorizontalDivider()
+        NavigationDrawerItem(
+            label = { Text(text = "Add new device") },
+            selected = false,
+            onClick = {  }
+        )
+        HorizontalDivider()
+        NavigationDrawerItem(
+            label = { Text(text = "My devices") },
+            selected = false,
+            onClick = {  }
+        )
+        HorizontalDivider()
+        NavigationDrawerItem(
+            label = { Text(text = "Logout") },
+            selected = false,
+            onClick = {  }
+        )
+    }
+}
+
+
+@Composable
 private fun MapScreenTopBar(
-    popNavBackStackCallback: () -> Unit,
-    name: String,
+    localCoroutineScope: CoroutineScope,
+    drawerState: DrawerState,
+    name: String
 ) {
     TopAppBar(
         title = {
@@ -140,17 +200,15 @@ private fun MapScreenTopBar(
             }
         },
         navigationIcon = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "BackIcon",
-                modifier = Modifier
-                    .clickable(onClick = {
-                        popNavBackStackCallback()
-                    })
-                    .padding(start = 10.dp)
+            IconButton(onClick = {
+                localCoroutineScope.launch { drawerState.open() }
+            }, content = {
+                Icon(
+                    imageVector = Icons.Default.Menu, contentDescription = null
+                )
+            }
             )
-        }
-    )
+        })
 }
 
 @Composable

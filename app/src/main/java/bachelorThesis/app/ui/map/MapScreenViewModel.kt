@@ -46,22 +46,22 @@ class MapScreenViewModel @Inject constructor(
     private val _state: MutableState<MapScreenState> = mutableStateOf(MapScreenState())
     val state: State<MapScreenState> = _state
 
-
-    init {
-        initMapScreenViewModel()
-    }
-
-    private fun initMapScreenViewModel() {
-        getJwtTokenUseCase()
-            .onEach { result ->
-                if (result.isNotEmpty()) {
-                    getDevicesFromDb()
-                } else {
-                    setError("Please re-login")
-                }
-            }.launchIn(viewModelScope)
-        // TODO: getPeriodicLocation() ?
-    }
+        // TODO: docasne na test vypnute
+//    init {
+//        initMapScreenViewModel()
+//    }
+//
+//    private fun initMapScreenViewModel() {
+//        getJwtTokenUseCase()
+//            .onEach { result ->
+//                if (result.isNotEmpty()) {
+//                    getDevicesFromDb()
+//                } else {
+//                    setError("Please re-login")
+//                }
+//            }.launchIn(viewModelScope)
+//        // TODO: getPeriodicLocation() ?
+//    }
 
 
     private fun getJwtToken() {
