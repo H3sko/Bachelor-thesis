@@ -1,10 +1,10 @@
 package com.example.routing
 
+import com.example.data.service.DeviceService
 import com.example.jwt.JWTService
 import com.example.models.ExposedGeofenceVertices
 import com.example.models.ExposedGeofences
 import com.example.models.GeofenceVertex
-import com.example.service.DeviceService
 import com.example.service.GeofenceService
 import com.example.service.GeofenceVerticesService
 import com.example.service.UserService
@@ -25,31 +25,32 @@ fun Route.geofencesDefault(jwtService: JWTService) {
             post {
                 val deviceId = call.parameters["deviceId"]?.toInt()
                 val vertices = call.receive<List<GeofenceVertex>>()
-                if (vertices.size < 3) {
-                    call.respond(HttpStatusCode.BadRequest, "Geofence needs at least 3 vertices")
-                }
+                if (vertices.size == 3) {
+                    val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+                        ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
+                    val userId = username?.let { it1 -> userService.getUserId(it1) }
+                    val device = deviceId?.let { it1 -> deviceService.readById(it1) }
 
-                val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
-                    ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
-                val userId = username?.let { it1 -> userService.getUserId(it1) }
-                val device = deviceId?.let { it1 -> deviceService.readById(it1) }
-
-                if (device != null){
-                    if (device.userId == userId) {
-                        if (geofenceService.exists(ExposedGeofences(deviceId)).not()) {
-                            val geofenceId = geofenceService.create(ExposedGeofences(deviceId))
-                            for (vertex in vertices) {
-                                geofenceVerticesService.create(ExposedGeofenceVertices(geofenceId, vertex.latitude, vertex.longitude))
+                    if (device != null){
+                        if (device.userId == userId) {
+                            if (geofenceService.exists(ExposedGeofences(deviceId)).not()) {
+                                val geofenceId = geofenceService.create(ExposedGeofences(deviceId))
+                                for (vertex in vertices) {
+                                    geofenceVerticesService.create(ExposedGeofenceVertices(geofenceId, vertex.latitude, vertex.longitude))
+                                }
+                                call.respond(HttpStatusCode.OK, "Geofence created")
+                            } else {
+                                call.respond(HttpStatusCode.Conflict, "This device already has a geofence")
                             }
-                            call.respond(HttpStatusCode.OK, "Geofence created")
                         } else {
-                            call.respond(HttpStatusCode.Conflict, "This device already has a geofence")
+                            call.respond(HttpStatusCode.Unauthorized, "Device $deviceId belongs to other user")
                         }
                     } else {
-                        call.respond(HttpStatusCode.Unauthorized, "Device $deviceId belongs to other user")
+                        call.respond(HttpStatusCode.NotFound, "Device $deviceId not found")
                     }
                 } else {
-                    call.respond(HttpStatusCode.NotFound, "Device $deviceId not found")
+                    call.respond(HttpStatusCode.BadRequest, "Geofence needs at least 3 vertices")
+
                 }
             }
         }

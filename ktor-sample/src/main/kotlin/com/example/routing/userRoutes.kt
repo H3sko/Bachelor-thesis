@@ -21,65 +21,66 @@ fun Route.usersDefault(jwtService: JWTService) {
         route("/login") {
             post {
                 val user = call.receive<UserRequest>()
-                if (user.username.isEmpty() || user.password.isEmpty()) {
+                if (user.username.isNotEmpty() && user.password.isNotEmpty()) {
+                    val token = jwtService.createJwtToken(user)
+
+                    token?.let {
+                        call.respond(HttpStatusCode.OK, hashMapOf("token" to token))
+                    } ?: call.respond(HttpStatusCode.Unauthorized)
+                } else {
                     call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
                 }
-
-                val token = jwtService.createJwtToken(user)
-
-                token?.let {
-                    call.respond(HttpStatusCode.OK, hashMapOf("token" to token))
-                } ?: call.respond(HttpStatusCode.Unauthorized)
             }
         }
         route("/register") {
             post {
                 val user = call.receive<UserRequest>()
-                if (user.username.isEmpty() || user.password.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
-                }
-
-                if (userService.getUser(user.username) != null) {
-                    call.respond(HttpStatusCode.Conflict, "User already exists")
-                } else {
-                    try {
-                        val salt = generateSalt(16)
-                        val passwordHash = sha256WithSalt(user.password, salt)
-                        val id = userService.create(ExposedUsers(user.username, passwordHash, salt))
-                        call.respond(HttpStatusCode.Created, id)
-                    } catch (ex: ExposedSQLException) {
-                        call.respond(HttpStatusCode.InternalServerError, ex.cause.toString())
+                if (user.username.isNotEmpty() && user.password.isNotEmpty()) {
+                    if (userService.getUserId(user.username) == null) {
+                        try {
+                            val salt = generateSalt(16)
+                            val passwordHash = sha256WithSalt(user.password, salt)
+                            val id = userService.create(ExposedUsers(user.username, passwordHash, salt))
+                            call.respond(HttpStatusCode.Created, id)
+                        } catch (ex: ExposedSQLException) {
+                            call.respond(HttpStatusCode.InternalServerError, ex.cause.toString())
+                        }
+                    } else {
+                        call.respond(HttpStatusCode.Conflict, "User already exists")
                     }
+                } else {
+                    call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
                 }
             }
         }
         route("/changePassword") {
             put {
                 val user = call.receive<PasswordChangeRequest>()
-                if (user.username.isEmpty() || user.oldPassword.isEmpty() || user.newPassword.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
-                }
-                val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
-                    ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
+                if (user.username.isNotEmpty() && user.oldPassword.isNotEmpty() && user.newPassword.isNotEmpty()) {
+                    val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+                        ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
 
-                if (username != null) {
-                    if (username == user.username) {
-                        val exposedUser = userService.getUser(username)
-                        if (exposedUser != null) {
-                            val oldPasswordHash = sha256WithSalt(user.oldPassword, exposedUser.salt)
-                            if (oldPasswordHash == exposedUser.passwordHash) {
-                                val newPasswordHash = sha256WithSalt(user.newPassword, exposedUser.salt)
-                                userService.update(PasswordChangeRequest(username, exposedUser.passwordHash, newPasswordHash))
-                                call.respond(HttpStatusCode.OK, "Password changed")
+                    if (username != null) {
+                        if (username == user.username) {
+                            val exposedUser = userService.getUser(username)
+                            if (exposedUser != null) {
+                                val oldPasswordHash = sha256WithSalt(user.oldPassword, exposedUser.salt)
+                                if (oldPasswordHash == exposedUser.passwordHash) {
+                                    val newPasswordHash = sha256WithSalt(user.newPassword, exposedUser.salt)
+                                    userService.update(PasswordChangeRequest(username, exposedUser.passwordHash, newPasswordHash))
+                                    call.respond(HttpStatusCode.OK, "Password changed")
+                                }
+                            } else {
+                                call.respond(HttpStatusCode.BadRequest, "User doesn't exist")
                             }
                         } else {
-                            call.respond(HttpStatusCode.BadRequest, "User doesn't exist")
+                            call.respond(HttpStatusCode.BadRequest, "Wrong username")
                         }
                     } else {
-                        call.respond(HttpStatusCode.BadRequest, "Wrong username")
+                        call.respond(HttpStatusCode.BadRequest, "Invalid credentials", )
                     }
                 } else {
-                    call.respond(HttpStatusCode.BadRequest, "Invalid credentials")
+                    call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
                 }
             }
         }

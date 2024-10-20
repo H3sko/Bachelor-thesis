@@ -1,7 +1,7 @@
 package com.example.quartz.jobs
 
+import com.example.data.service.DeviceService
 import com.example.models.ExposedLocations
-import com.example.service.DeviceService
 import com.example.service.LocationsService
 import com.example.utils.ITEMS_DATA_PATH
 import com.example.utils.libs.fetchDataFromFile

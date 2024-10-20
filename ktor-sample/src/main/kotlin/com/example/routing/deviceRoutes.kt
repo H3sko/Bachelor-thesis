@@ -1,11 +1,10 @@
 package com.example.routing
 
+import com.example.data.service.DeviceService
 import com.example.jwt.JWTService
 import com.example.models.DeviceCredentials
 import com.example.models.ExposedDevices
-import com.example.service.DeviceService
 import com.example.service.UserService
-import com.example.utils.libs.exists
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -19,17 +18,39 @@ fun Route.devicesDefault(jwtService: JWTService) {
     route("/device") {
         route("/add") {
             post {
-                val deviceCredentials = call.receive<DeviceCredentials>()
-                if (deviceCredentials.name.isEmpty() || deviceCredentials.owner.isEmpty()){
-                    call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
-                }
+//                if ITEMS.DATA wasn't encrypted
+//
+//                val deviceCredentials = call.receive<DeviceCredentials>()
+//                if (deviceCredentials.name.isEmpty() || deviceCredentials.owner.isEmpty()){
+//                    call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
+//                }
+//
+//                val serialNumber: String? = exists(deviceCredentials)
+//                if (serialNumber != null) {
+//                    val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+//                        ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
+//                    val userId = username?.let { it1 -> userService.getUserId(it1) }
+//                    val deviceIsInDatabase = userId?.let { it1 -> deviceService.inDatabaseBySerialNumber(serialNumber) }
+//
+//                    if (deviceIsInDatabase != null) {
+//                        if (deviceIsInDatabase.not()) {
+//                            val deviceId = deviceService.create(ExposedDevices(userId, deviceCredentials.name, serialNumber))
+//                            call.respond(HttpStatusCode.OK, deviceId)
+//                        } else {
+//                            call.respond(HttpStatusCode.Conflict, "This device is already in the database")
+//                        }
+//                    }
+//                } else {
+//                    call.respond(HttpStatusCode.NotFound, "Device ${deviceCredentials.name} that belongs to ${deviceCredentials.owner} was not found")
+//                }
 
-                val serialNumber: String? = exists(deviceCredentials)
-                if (serialNumber != null) {
+                val deviceCredentials = call.receive<DeviceCredentials>()
+                if (deviceCredentials.name.isNotEmpty() && deviceCredentials.owner.isNotEmpty()){
+                    val serialNumber: String = (deviceService.getAllIds().size + 1).toString()
                     val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
                         ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
                     val userId = username?.let { it1 -> userService.getUserId(it1) }
-                    val deviceIsInDatabase = userId?.let { it1 -> deviceService.inDatabaseBySerialNumber(serialNumber) }
+                    val deviceIsInDatabase = userId?.let { _ -> deviceService.inDatabaseByName(deviceCredentials.name) }
 
                     if (deviceIsInDatabase != null) {
                         if (deviceIsInDatabase.not()) {
@@ -40,7 +61,8 @@ fun Route.devicesDefault(jwtService: JWTService) {
                         }
                     }
                 } else {
-                    call.respond(HttpStatusCode.NotFound, "Device ${deviceCredentials.name} that belongs to ${deviceCredentials.owner} was not found")
+                    call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
+
                 }
             }
         }
@@ -48,9 +70,6 @@ fun Route.devicesDefault(jwtService: JWTService) {
             delete {
                 val id = call.parameters["id"]?.toInt()
 
-                val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
-                    ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
-                val userId = username?.let { it1 -> userService.getUserId(it1) }
                 val deviceExists = id?.let { it1 -> deviceService.inDatabase(it1) }
 
                 if (deviceExists != null) {

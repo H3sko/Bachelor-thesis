@@ -42,11 +42,11 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-server-auth:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
-    implementation("org.postgresql:postgresql:42.7.0")
+    implementation("org.postgresql:postgresql:42.7.2")
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("org.quartz-scheduler:quartz:2.3.2")
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
 
 
     implementation("org.jetbrains.exposed:exposed:0.17.14")
@@ -59,7 +59,26 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-money:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-spring-boot-starter:$exposedVersion")
 
+    testImplementation("io.rest-assured:rest-assured:5.5.0")
+    testImplementation("io.rest-assured:kotlin-extensions:5.5.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testImplementation("org.junit.vintage:junit-vintage-engine:$junitVersion")
+}
+
+sourceSets {
+    test {
+        java.srcDirs("src/test/kotlin")
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+    
+    testClassesDirs = layout.buildDirectory.dir("classes/kotlin/test").get().asFileTree
+    classpath = files(layout.buildDirectory.dir("classes/kotlin/test").get()) + classpath
+
+    testLogging {
+        events("passed", "failed", "skipped")
+    }
 }

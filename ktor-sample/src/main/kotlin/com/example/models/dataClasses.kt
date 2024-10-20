@@ -52,16 +52,27 @@ data class ExposedDeviceResponse(
 )
 
 @Serializable
-data class UserCredentialsRequest(val username: String, val passwordHash: String)
+data class UserCredentialsRequest(
+    val username: String,
+    val passwordHash: String
+)
 
 @Serializable
-data class UserRequest(val username: String, val password: String)
+data class UserRequest(
+    val username: String,
+    val password: String
+)
 
 @Serializable
-data class DeviceCredentials(val name: String, val owner: String)
+data class DeviceCredentials(
+    val name: String,
+    val owner: String
+)
 
 @Serializable
-data class GeofenceVertexRequest(val geofenceId: Int)
+data class GeofenceVertexRequest(
+    val geofenceId: Int
+)
 
 @Serializable
 data class GeofenceVertex(

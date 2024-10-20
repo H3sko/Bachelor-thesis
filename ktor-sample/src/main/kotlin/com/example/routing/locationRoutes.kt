@@ -1,9 +1,9 @@
 package com.example.routing
 
+import com.example.data.service.DeviceService
 import com.example.jwt.JWTService
 import com.example.models.ExposedLocations
 import com.example.models.LocationDto
-import com.example.service.DeviceService
 import com.example.service.LocationsService
 import com.example.service.UserService
 import io.ktor.http.*
@@ -24,7 +24,7 @@ fun Route.locationsDefault(jwtService: JWTService) {
                 val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
                     ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
                 val userId = username?.let { it1 -> userService.getUserId(it1) }
-                val device = deviceId?.let { it1 -> deviceService.readById(deviceId) }
+                val device = deviceId?.let { _ -> deviceService.readById(deviceId) }
 
                 if (device != null) {
                     if (device.userId == userId) {
@@ -74,7 +74,7 @@ fun Route.locationsDefault(jwtService: JWTService) {
                         call.respond(HttpStatusCode.Unauthorized, "Device $deviceId belongs to a different user")
                     }
                 } else {
-                    call.respond(HttpStatusCode.BadRequest, "Missing 'deviceId' parameter")
+                    call.respond(HttpStatusCode.BadRequest, "Device not found")
                 }
             }
         }

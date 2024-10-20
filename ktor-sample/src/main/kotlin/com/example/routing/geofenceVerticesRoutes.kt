@@ -1,9 +1,9 @@
 package com.example.routing
 
+import com.example.data.service.DeviceService
 import com.example.jwt.JWTService
 import com.example.models.ExposedGeofenceVertices
 import com.example.models.GeofenceVertexRequest
-import com.example.service.DeviceService
 import com.example.service.GeofenceService
 import com.example.service.GeofenceVerticesService
 import com.example.service.UserService

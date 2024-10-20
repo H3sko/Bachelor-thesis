@@ -5,3 +5,9 @@ const val DELAY_REFRESH: Long = 60000
 const val defaultZoom = 16f
 const val MinZoom = 2f
 const val MaxZoom = 20f
+
+enum class DrawerContentType {
+    MAIN_MENU,
+    MY_DEVICES,
+    ADD_NEW_DEVICE
+}

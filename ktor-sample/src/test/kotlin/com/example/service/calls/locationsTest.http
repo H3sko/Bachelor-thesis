@@ -3,59 +3,40 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTUyMDgxNzB9.9E6kCA6ZchPTCJLT9GHKBkxEbU6bkCsTN27anIcBEXo
 
 {
-  "deviceId": 1,
-  "latitude": 48.18388718662684,
-  "longitude": 17.26555384022185,
-  "timestamp": "2024-04-01T08:00:00"
+  "deviceId": 6,
+  "latitude": 49.210060,
+  "longitude": 16.599250,
+  "timestamp": "2024-10-10T08:00:00"
 }
 
 ###
-POST http://127.0.0.1:8080/location/add
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTUyMDgxNzB9.9E6kCA6ZchPTCJLT9GHKBkxEbU6bkCsTN27anIcBEXo
-
-{
-  "deviceId": 1,
-  "latitude": 48.18388718662684,
-  "longitude": 48.18388718662684,
-  "timestamp": "2024-04-03T10:30:00"
-}
-
-###
-POST http://127.0.0.1:8080/location/add
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTUyMDgxNzB9.9E6kCA6ZchPTCJLT9GHKBkxEbU6bkCsTN27anIcBEXo
-
-{
-  "deviceId": 1,
-  "latitude": 34.0522,
-  "longitude": -118.2437,
-  "timestamp": "2024-04-05T12:45:00"
-}
-
-###
-POST http://127.0.0.1:8080/location/add
-Content-Type: application/json
-
-{
-  "deviceId": 22,
-  "latitude": 51.5074,
-  "longitude": "-0.1278",
-  "timestamp": "2024-04-07T15:20:00"
-}
-
-###
-GET http://127.0.0.1:8080/location/getLatest/1
+GET http://127.0.0.1:8080/location/getLatest/6
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTIwNzk2N30.Qw_jSIjJVIgszwOlFIdDEHxB0we0LYS81hnlEXppKtc
 
 ###
-GET http://127.0.0.1:8080/location/5
+POST http://127.0.0.1:8080/location/add
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTUyMDgxNzB9.9E6kCA6ZchPTCJLT9GHKBkxEbU6bkCsTN27anIcBEXo
+
+{
+"deviceId": 6,
+"latitude": 49.210800,
+"longitude": 16.598400,
+"timestamp": "2024-10-10T09:30:00"
+}
+
+
+### Admin calls
+###
+GET http://127.0.0.1:8080/location/6
 Content-Type: application/json
 
 ###
-DELETE http://127.0.0.1:8080/location/1
+DELETE http://127.0.0.1:8080/location/208
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTQ2NjA1NTV9.sz4ycqjliI8R5w1q74Vg7-KS1588bVnPOFPNDqOF_aM
+
 
 ###
 GET http://127.0.0.1:8080/location/getAll

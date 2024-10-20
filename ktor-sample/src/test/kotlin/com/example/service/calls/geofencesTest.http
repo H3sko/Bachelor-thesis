@@ -1,4 +1,4 @@
-POST http://127.0.0.1:8080/geofence/add/2
+POST http://127.0.0.1:8080/geofence/add/6
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTI4MzkzOH0.nXKEungsNxaK6UJnO-z46YSdaBALYqCZLW6cs3_5O44
 
@@ -9,12 +9,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwia
 ]
 
 ###
-GET http://127.0.0.1:8080/geofence/device/2
+GET http://127.0.0.1:8080/geofence/device/6
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTI4NTIxMX0.5Jp6tj-r49wJRfV_3UYs2VnPAl6ktZHBF40ruC0rw_k
 
 ###
-DELETE http://127.0.0.1:8080/geofence/delete/device/2
+DELETE http://127.0.0.1:8080/geofence/delete/device/6
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTI4NTIxMX0.5Jp6tj-r49wJRfV_3UYs2VnPAl6ktZHBF40ruC0rw_k
 

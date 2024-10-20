@@ -6,6 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import bachelorThesis.app.common.DELAY_REFRESH
 import bachelorThesis.app.common.Resource
 import bachelorThesis.app.common.defaultZoom
 import bachelorThesis.app.data.remote.dto.Device
@@ -25,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -46,23 +48,89 @@ class MapScreenViewModel @Inject constructor(
     private val _state: MutableState<MapScreenState> = mutableStateOf(MapScreenState())
     val state: State<MapScreenState> = _state
 
-        // TODO: docasne na test vypnute
-//    init {
-//        initMapScreenViewModel()
-//    }
-//
-//    private fun initMapScreenViewModel() {
-//        getJwtTokenUseCase()
-//            .onEach { result ->
-//                if (result.isNotEmpty()) {
-//                    getDevicesFromDb()
-//                } else {
-//                    setError("Please re-login")
-//                }
-//            }.launchIn(viewModelScope)
-//        // TODO: getPeriodicLocation() ?
-//    }
+    init {
+        initMapScreenViewModel()
+    }
 
+    private fun initMapScreenViewModel() {
+        getJwtTokenUseCase()
+            .onEach { result ->
+                if (result.isNotEmpty()) {
+                    getDevicesFromDb()
+                    getPeriodicLocations() // TODO: toto mozno nebude fungovat a treba to spravit v LaunchedEffecte (cchatGPT hovori ze idealne vo ViewModeli)
+                } else {
+                    setError("Please re-login")
+                }
+            }.launchIn(viewModelScope)
+    }
+
+//    TODO: vyzera byt done, treba otestovat, ale najprv spravit ten vyber devicov
+
+    public fun getLocationFromDb() {
+        val deviceId = _state.value.device?.id
+        if (deviceId != null) {
+            getLocationUseCase(credentials = _state.value.token, deviceId = deviceId.toString())
+                .onEach { result ->
+                    when (result) {
+                        is Resource.Loading -> {}
+                        is Resource.Success -> {
+                            if (result.data != null) {
+                                setLocationLatest(result.data)
+                            }
+                        }
+                        is Resource.Error -> {
+                            when (result.code) {
+                                401 -> { setError("Try to re-login") }
+                                404 -> { setError("This device doesn't exist, try to re-login") }
+                                409 -> { setError("Can't find the device's location") }
+                                -1 -> { setError("Internet connection error") }
+                                else -> { setError("An unexpected error occurred") }
+                            }
+                        }
+                    }
+                }.launchIn(viewModelScope)
+        }
+    }
+
+    fun getAllLocationsFromDb() {
+        val deviceId = _state.value.device?.id
+        if (deviceId != null) {
+            getAllLocationsUseCase(credentials = _state.value.token, deviceId = deviceId.toString())
+                .onEach { result ->
+                    when (result) {
+                        is Resource.Loading -> {}
+                        is Resource.Success -> {
+                            if (result.data != null) {
+                                setLocationHistory(result.data)
+                            }
+                        }
+                        is Resource.Error -> {
+                            when (result.code) {
+                                401 -> { setError("Try to re-login") }
+                                404 -> { setError("This device doesn't exist, try to re-login") }
+                                409 -> { setError("Can't find the device's location") }
+                                -1 -> { setError("Internet connection error") }
+                                else -> { setError("An unexpected error occurred") }
+                            }
+                        }
+                    }
+                }.launchIn(viewModelScope)
+        } else {
+            setError("Something went wrong, please try again")
+        }
+    }
+
+    private suspend fun getPeriodicLocations() {
+            while(true) {
+                getLocationFromDb()
+                getAllLocationsFromDb()
+                delay(DELAY_REFRESH)
+            }
+    }
+
+//    TODO: ? appendPath() ako appendNewLocationsHistory() (ak by som miesto vzdy vytiahnutia latest 10 locactions chcel po jednej updatovat)
+
+//    TODO: este nezacate
 
     private fun getJwtToken() {
         getJwtTokenUseCase()
@@ -76,25 +144,27 @@ class MapScreenViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun addDeviceToDb() {
-        addDeviceUseCase(_state.value.token, DeviceCredentials(state.value.deviceName, state.value.deviceOwner))
+    fun addDeviceToDb(name: String, owner: String) {
+        setMessage(null)
+        addDeviceUseCase(_state.value.token, DeviceCredentials(name, owner))
             .onEach { result ->
                 when (result) {
                     is Resource.Loading -> {}
                     is Resource.Success -> {
                         if (result.data != null) {
-                            addDevice(Device(result.data, state.value.deviceName))
+                            addDevice(Device(result.data, name))
+                            setMessage("Airtag added successfully")
                         } else {
-                            setError("Something went wrong, please restart the app to load the devices properly")
+                            setMessage("Something went wrong, please restart the app to load the devices properly")
                         }
                     }
                     is Resource.Error -> {
                         when(result.code) {
-                            400 -> { setError("Credentials cannot be empty") }
-                            404 -> { setError("${state.value.deviceName} device doesn't match to the ${state.value.deviceOwner} owner") }
-                            409 -> { setError("You have already added this device") }
-                            -1 -> { setError("Internet connection error") }
-                            else -> { setError("An unexpected error occurred") }
+                            400 -> { setMessage("Credentials cannot be empty") }
+                            404 -> { setMessage("$name device doesn't match to the $owner owner") }
+                            409 -> { setMessage("You have already added this device") }
+                            -1 -> { setMessage("Internet connection error") }
+                            else -> { setMessage("An unexpected error occurred") }
                         }
                     }
                 }
@@ -124,28 +194,23 @@ class MapScreenViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun removeDeviceFromDb() {
-        val deviceId = _state.value.device?.id
-        if (deviceId != null) {
-            removeDeviceUseCase(_state.value.token, deviceId.toString())
-                .onEach { result ->
-                    when (result) {
-                        is Resource.Loading -> {}
-                        is Resource.Success -> {
-                            removeDevice(deviceId)
-                        }
-                        is Resource.Error -> {
-                            when(result.code) {
-                                409 -> { setError("Device that you are trying to delete, doesn't exist, please reload the app") }
-                                -1 -> { setError("Internet connection error") }
-                                else -> { setError("An unexpected error occurred") }
-                            }
+    fun removeDeviceFromDb(deviceId: Int) {
+        removeDeviceUseCase(_state.value.token, deviceId.toString())
+            .onEach { result ->
+                when (result) {
+                    is Resource.Loading -> {}
+                    is Resource.Success -> {
+                        removeDevice(deviceId)
+                    }
+                    is Resource.Error -> {
+                        when(result.code) {
+                            409 -> { setError("Device that you are trying to delete, doesn't exist, please reload the app") }
+                            -1 -> { setError("Internet connection error") }
+                            else -> { setError("An unexpected error occurred") }
                         }
                     }
-                }.launchIn(viewModelScope)
-        } else {
-            setError("Something went wrong, please try again")
-        }
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun addGeofenceToDb() {
@@ -164,24 +229,12 @@ class MapScreenViewModel @Inject constructor(
                         }
                         is Resource.Error -> {
                             when (result.code) {
-                                400 -> {
-                                    setError("Geofence needs at least 3 vertices")
-                                }
-                                401 -> {
-                                    setError("Try to re-login")
-                                }
-                                404 -> {
-                                    setError("This device doesn't exist, please try again")
-                                }
-                                409 -> {
-                                    setError("This device already has a geofence")
-                                }
-                                -1 -> {
-                                    setError("Internet connection error")
-                                }
-                                else -> {
-                                    setError("An unexpected error occurred")
-                                }
+                                400 -> { setError("Geofence needs at least 3 vertices") }
+                                401 -> { setError("Try to re-login") }
+                                404 -> { setError("This device doesn't exist, please try again") }
+                                409 -> { setError("This device already has a geofence") }
+                                -1 -> { setError("Internet connection error") }
+                                else -> { setError("An unexpected error occurred") }
                             }
                         }
                     }
@@ -205,21 +258,11 @@ class MapScreenViewModel @Inject constructor(
                         }
                         is Resource.Error -> {
                             when (result.code) {
-                                400 -> {
-                                    setError("This device doesn't exist, please try again")
-                                }
-                                401 -> {
-                                    setError("Try to re-login")
-                                }
-                                404 -> {
-                                    setError("This device doesn't have a geofence")
-                                }
-                                -1 -> {
-                                    setError("Internet connection error")
-                                }
-                                else -> {
-                                    setError("An unexpected error occurred")
-                                }
+                                400 -> { setError("This device doesn't exist, please try again") }
+                                401 -> { setError("Try to re-login") }
+                                404 -> { setError("This device doesn't have a geofence") }
+                                -1 -> { setError("Internet connection error") }
+                                else -> { setError("An unexpected error occurred") }
                             }
                         }
                     }
@@ -241,94 +284,10 @@ class MapScreenViewModel @Inject constructor(
                         }
                         is Resource.Error -> {
                             when (result.code) {
-                                401 -> {
-                                    setError("Try to re-login")
-                                }
-                                404 -> {
-                                    setError("This device doesn't exist, try to re-login")
-                                }
-                                -1 -> {
-                                    setError("Internet connection error")
-                                }
-                                else -> {
-                                    setError("An unexpected error occurred")
-                                }
-                            }
-                        }
-                    }
-                }.launchIn(viewModelScope)
-        } else {
-            setError("Something went wrong, please try again")
-        }
-    }
-
-    fun getAllLocationsFromDb() {
-        val deviceId = _state.value.device?.id
-        if (deviceId != null) {
-            getAllLocationsUseCase(credentials = _state.value.token, deviceId = deviceId.toString())
-                .onEach { result ->
-                    when (result) {
-                        is Resource.Loading -> {}
-                        is Resource.Success -> {
-                            if (result.data != null) {
-                                setLocationHistory(result.data)
-                            }
-                        }
-                        is Resource.Error -> {
-                            when (result.code) {
-                                401 -> {
-                                    setError("Try to re-login")
-                                }
-                                404 -> {
-                                    setError("This device doesn't exist, try to re-login")
-                                }
-                                409 -> {
-                                    setError("Can't find the device's location")
-                                }
-                                -1 -> {
-                                    setError("Internet connection error")
-                                }
-                                else -> {
-                                    setError("An unexpected error occurred")
-                                }
-                            }
-                        }
-                    }
-                }.launchIn(viewModelScope)
-        } else {
-            setError("Something went wrong, please try again")
-        }
-    }
-
-    fun getLocationFromDb() {
-        val deviceId = _state.value.device?.id
-        if (deviceId != null) {
-            getLocationUseCase(credentials = _state.value.token, deviceId = deviceId.toString())
-                .onEach { result ->
-                    when (result) {
-                        is Resource.Loading -> {}
-                        is Resource.Success -> {
-                            if (result.data != null) {
-                                setLocationLatest(result.data)
-                            }
-                        }
-                        is Resource.Error -> {
-                            when (result.code) {
-                                401 -> {
-                                    setError("Try to re-login")
-                                }
-                                404 -> {
-                                    setError("This device doesn't exist, try to re-login")
-                                }
-                                409 -> {
-                                    setError("Can't find the device's location")
-                                }
-                                -1 -> {
-                                    setError("Internet connection error")
-                                }
-                                else -> {
-                                    setError("An unexpected error occurred")
-                                }
+                                401 -> { setError("Try to re-login") }
+                                404 -> { setError("This device doesn't exist, try to re-login") }
+                                -1 -> { setError("Internet connection error") }
+                                else -> { setError("An unexpected error occurred") }
                             }
                         }
                     }
@@ -348,15 +307,7 @@ class MapScreenViewModel @Inject constructor(
         }
     }
 
-    // TODO: prerobit na getPeriodicLocations()
-//    private suspend fun getPeriodicLocations() {
-//            while(true) {
-//                getLocationFromDb()
-//                delay(DELAY_REFRESH)
-//            }
-//    }
-
-    private fun setDevice(newValue: Device) {
+    fun setDevice(newValue: Device) {
         _state.value = state.value.copy(
             device = newValue
         )
@@ -386,14 +337,14 @@ class MapScreenViewModel @Inject constructor(
         )
     }
 
-    private fun removeDevice(deviceId: Int) {
+    fun removeDevice(deviceId: Int) {
         val updatedDevices = state.value.devices.filter { it.id != deviceId }
         _state.value = state.value.copy(
             devices = updatedDevices
         )
     }
 
-    private fun addDevice(newDevice: Device) {
+    fun addDevice(newDevice: Device) {
         _state.value = state.value.copy(
             devices = state.value.devices + newDevice
         )
@@ -409,6 +360,12 @@ class MapScreenViewModel @Inject constructor(
     private fun setError(message: String?) {
         _state.value = state.value.copy(
             error = message
+        )
+    }
+
+    private fun setMessage(message: String?) {
+        _state.value = state.value.copy(
+            message = message
         )
     }
 

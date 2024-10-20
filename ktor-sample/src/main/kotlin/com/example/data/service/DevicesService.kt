@@ -1,8 +1,10 @@
-package com.example.service
+package com.example.data.service
 
 import com.example.models.Devices
 import com.example.models.ExposedDeviceResponse
 import com.example.models.ExposedDevices
+import com.example.service.IDeviceService
+import com.example.service.dbQuery
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -59,6 +61,14 @@ class DeviceService : IDeviceService {
         }
     }
 
+    override suspend fun inDatabaseByName(deviceName: String): Boolean {
+        return dbQuery {
+            Devices.selectAll()
+                .where { Devices.name eq deviceName}
+                .count() > 0
+        }
+    }
+
     override suspend fun inDatabaseBySerialNumber(serialNumber: String): Boolean {
         return dbQuery {
             Devices.selectAll()
@@ -78,6 +88,14 @@ class DeviceService : IDeviceService {
                         it[Devices.serialNumber]
                     )
                 }
+        }
+    }
+
+    override suspend fun getAllIds(): List<Int> {
+        return dbQuery {
+            Devices.selectAll().map {
+                it[Devices.id].value
+            }
         }
     }
 
