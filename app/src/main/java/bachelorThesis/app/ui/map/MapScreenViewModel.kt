@@ -70,6 +70,7 @@ class MapScreenViewModel @Inject constructor(
 //    TODO: vyzera byt done, treba otestovat, ale najprv spravit ten vyber devicov
 
     public fun getLocationFromDb() {
+        setLocationLatest(null)
         val deviceId = _state.value.device?.id
         if (deviceId != null) {
             getLocationUseCase(credentials = token, deviceId = deviceId.toString())
@@ -150,7 +151,6 @@ class MapScreenViewModel @Inject constructor(
     }
 
     fun addDeviceToDb(name: String, owner: String) {
-        setMessage(null)
         addDeviceUseCase(credentials = token, DeviceCredentials(name, owner))
             .onEach { result ->
                 when (result) {
@@ -158,7 +158,7 @@ class MapScreenViewModel @Inject constructor(
                     is Resource.Success -> {
                         if (result.data != null) {
                             addDevice(Device(result.data, name))
-                            setMessage("Airtag added successfully")
+                            setMessage("Airtag added successfully!")
                         } else {
                             setMessage("Something went wrong, please restart the app to load the devices properly")
                         }
@@ -372,13 +372,13 @@ class MapScreenViewModel @Inject constructor(
     }
 
 
-    private fun setError(message: String?) {
+    fun setError(message: String?) {
         _state.value = state.value.copy(
             error = message
         )
     }
 
-    private fun setMessage(message: String?) {
+    fun setMessage(message: String?) {
         _state.value = state.value.copy(
             message = message
         )
@@ -390,13 +390,13 @@ class MapScreenViewModel @Inject constructor(
         )
     }
 
-    private fun setShowLocationHistory(newValue: Boolean) {
+    fun setShowLocationHistory(newValue: Boolean) {
         _state.value = state.value.copy(
             showLocationHistory = newValue
         )
     }
 
-    private fun setShowGeofence(newValue: Boolean) {
+    fun setShowGeofence(newValue: Boolean) {
         _state.value = state.value.copy(
             showGeofence = newValue
         )

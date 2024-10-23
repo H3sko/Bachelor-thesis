@@ -100,8 +100,9 @@ fun MapScreen(
     LaunchedEffect(state.device) {
         state.device?.let { device ->
             viewModel.getLocationFromDb()
-            viewModel.getAllLocationsFromDb() // TODO: toto robi problemy, vyriesit
+            viewModel.getAllLocationsFromDb()
 //            viewModel.getGeofenceFromDb()
+            viewModel.updateCameraPosition() // TODO: toto nefunguje
         } ?: run {
             viewModel.setDeviceGeofenceVertices(emptyList())
             viewModel.setLocationLatest(null)
@@ -150,7 +151,9 @@ fun MapScreen(
                 Row (horizontalArrangement = Arrangement.Center) {
                     FloatingActionButton(
                         onClick = {
-                            localCoroutineScope.launch { state.showLocationHistory = !state.showLocationHistory }
+                            localCoroutineScope.launch {
+                                viewModel.setShowLocationHistory(!state.showLocationHistory)
+                            }
                         },
                         Modifier.background( color =  if (state.locationHistory.isNotEmpty()) colorScheme.primary else colorScheme.secondary)
                     ) {
@@ -161,7 +164,9 @@ fun MapScreen(
                     }
                     FloatingActionButton(
                         onClick = {
-                            localCoroutineScope.launch { state.showGeofence = !state.showGeofence }
+                            localCoroutineScope.launch { 
+                                viewModel.setShowGeofence(!state.showGeofence)
+                            }
                         },
                         Modifier.background( color = colorScheme.primary)
                     ) {
@@ -172,7 +177,9 @@ fun MapScreen(
                     }
                     FloatingActionButton(
                         onClick = {
-                            localCoroutineScope.launch { viewModel.updateCameraPosition() }
+                            localCoroutineScope.launch { 
+                                viewModel.updateCameraPosition() 
+                            }
                         },
                         Modifier.background( color = colorScheme.primary)
                     ) {
@@ -185,10 +192,9 @@ fun MapScreen(
             }
         ) {
             MapScreenContent(
-                state
-            ) {
-                localCoroutineScope.launch { viewModel.updateCameraPosition() }
-            }
+                state,
+                viewModel
+            ) {}
         }
     }
 
@@ -217,7 +223,8 @@ fun ModalDrawerContent(
             DrawerContentType.MY_DEVICES -> MyDevicesContent(
                 state = state,
                 viewModel = viewModel,
-                onBackToMenu = { onContentChange(DrawerContentType.MAIN_MENU) }
+                onBackToMenu = { onContentChange(DrawerContentType.MAIN_MENU) },
+                closeDrawer = closeDrawer
             )
             DrawerContentType.ADD_NEW_DEVICE -> AddNewDeviceContent(
                 state = state,
@@ -332,7 +339,8 @@ fun SwipeableNavigationDrawerItem(
 fun MyDevicesContent(
     state: MapScreenState,
     viewModel: MapScreenViewModel,
-    onBackToMenu: () -> Unit
+    onBackToMenu: () -> Unit,
+    closeDrawer: () -> Unit,
 ) {
     NavigationDrawerItem(
         label = { Text(text = "Back to Menu") },
@@ -358,8 +366,7 @@ fun MyDevicesContent(
                     onDelete = { viewModel.removeDeviceFromDb(device.id) },
                     onItemClicked = {
                         viewModel.setDevice(device)
-//                        viewModel.updateCameraPosition() // TODO: porozmyslat a dorobit
-                        onBackToMenu()
+                        closeDrawer()
                     }
                 )
                 HorizontalDivider()
@@ -378,11 +385,26 @@ fun AddNewDeviceContent(
     var deviceOwner by remember { mutableStateOf("") }
     var successMessage by remember { mutableStateOf("") }
 
+    LaunchedEffect(state.message) {
+        state.message?.let { message ->
+            if (message == "Airtag added successfully") {
+                successMessage = "Airtag added successfully!"
+                deviceName = ""
+                deviceOwner = ""
+            } else {
+                successMessage = message
+            }
+        }
+    }
+
     NavigationDrawerItem(
         label = { Text(text = "Back to Menu") },
         icon = { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) },
         selected = false,
-        onClick = { onBackToMenu() }
+        onClick = {
+            onBackToMenu()
+            viewModel.setMessage(null)
+        }
     )
     HorizontalDivider()
 
@@ -419,17 +441,6 @@ fun AddNewDeviceContent(
         Button(
             onClick = {
                 viewModel.addDeviceToDb(deviceName, deviceOwner)
-                if (state.message != null) {
-                    if (state.message == "Airtag added successfully"){
-                        successMessage = "Airtag added successfully!"
-                        deviceName = ""
-                        deviceOwner = ""
-                    } else {
-                        successMessage = state.message
-                    }
-                } else {
-                    successMessage = "Something went wrong. Please try again."
-                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -439,7 +450,7 @@ fun AddNewDeviceContent(
         if (successMessage.isNotEmpty()) {
             Text(
                 text = successMessage,
-                color = if (state.message == "Airtag added successfully") Color.Green else Color.Red,
+                color = if (state.message == "Airtag added successfully!") Color.Green else Color.Red,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(top = 16.dp)
             )
@@ -485,11 +496,13 @@ fun GeofenceContent(
             )
         }
     } else {
-        Text(
-            text = "No device selected.",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+        Column {
+            Text(
+                text = "No device selected.",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
     }
 }
 
@@ -532,6 +545,7 @@ private fun MapScreenTopBar(
 @Composable
 private fun MapScreenContent(
     state: MapScreenState,
+    viewModel: MapScreenViewModel,
     updateCameraCallback: () -> Unit
 ) {
 
@@ -553,8 +567,10 @@ private fun MapScreenContent(
         if (state.locationLatest != null) { // TODO: pridat nejaku icon mozno
             Marker(state = rememberMarkerState(position = LatLng(state.locationLatest!!.latitude, state.locationLatest!!.longitude)))
         }
-        if (state.locationHistory.isNotEmpty() && state.showLocationHistory) {
-            Polyline(points = state.locationHistory.map { LatLng(it.latitude, it.longitude) })
+        if (state.locationHistory.isNotEmpty()) {
+            if (state.showLocationHistory) {
+                Polyline(points = state.locationHistory.map { LatLng(it.latitude, it.longitude) })
+            }
         }
         if (state.deviceGeofenceVertices.isNotEmpty() && state.showGeofence) {
             Polygon(
