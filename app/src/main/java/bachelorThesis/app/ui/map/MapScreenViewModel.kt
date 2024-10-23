@@ -48,6 +48,8 @@ class MapScreenViewModel @Inject constructor(
     private val _state: MutableState<MapScreenState> = mutableStateOf(MapScreenState())
     val state: State<MapScreenState> = _state
 
+    private var token: String = "" // TODO: Mozno trochu shady, uvidim co Lukas povie, ked tak prerobim ze v kazdej funkcii si bude vzdy najprv volat getJwtTokenUseCase()
+
     init {
         initMapScreenViewModel()
     }
@@ -56,8 +58,9 @@ class MapScreenViewModel @Inject constructor(
         getJwtTokenUseCase()
             .onEach { result ->
                 if (result.isNotEmpty()) {
+                    token = "Bearer $result"
                     getDevicesFromDb()
-                    getPeriodicLocations() // TODO: toto mozno nebude fungovat a treba to spravit v LaunchedEffecte (cchatGPT hovori ze idealne vo ViewModeli)
+                    getPeriodicLocations() // TODO: toto mozno nebude fungovat a treba to spravit v LaunchedEffecte (chatGPT hovori ze idealne vo ViewModeli)
                 } else {
                     setError("Please re-login")
                 }
@@ -69,7 +72,7 @@ class MapScreenViewModel @Inject constructor(
     public fun getLocationFromDb() {
         val deviceId = _state.value.device?.id
         if (deviceId != null) {
-            getLocationUseCase(credentials = _state.value.token, deviceId = deviceId.toString())
+            getLocationUseCase(credentials = token, deviceId = deviceId.toString())
                 .onEach { result ->
                     when (result) {
                         is Resource.Loading -> {}
@@ -95,7 +98,7 @@ class MapScreenViewModel @Inject constructor(
     fun getAllLocationsFromDb() {
         val deviceId = _state.value.device?.id
         if (deviceId != null) {
-            getAllLocationsUseCase(credentials = _state.value.token, deviceId = deviceId.toString())
+            getAllLocationsUseCase(credentials = token, deviceId = deviceId.toString())
                 .onEach { result ->
                     when (result) {
                         is Resource.Loading -> {}
@@ -122,8 +125,10 @@ class MapScreenViewModel @Inject constructor(
 
     private suspend fun getPeriodicLocations() {
             while(true) {
-                getLocationFromDb()
-                getAllLocationsFromDb()
+                if (state.value.device != null) {
+                    getLocationFromDb()
+                    getAllLocationsFromDb()
+                }
                 delay(DELAY_REFRESH)
             }
     }
@@ -146,7 +151,7 @@ class MapScreenViewModel @Inject constructor(
 
     fun addDeviceToDb(name: String, owner: String) {
         setMessage(null)
-        addDeviceUseCase(_state.value.token, DeviceCredentials(name, owner))
+        addDeviceUseCase(credentials = token, DeviceCredentials(name, owner))
             .onEach { result ->
                 when (result) {
                     is Resource.Loading -> {}
@@ -172,19 +177,19 @@ class MapScreenViewModel @Inject constructor(
     }
 
     private fun getDevicesFromDb() {
-        getDevicesUseCase(_state.value.token)
-            .onEach { result ->
-                when (result) {
+        getDevicesUseCase(credentials = token)
+            .onEach { result2 ->
+                when (result2) {
                     is Resource.Loading -> {}
                     is Resource.Success -> {
-                        if (result.data != null) {
-                            setDevices(result.data)
+                        if (result2.data != null) {
+                            setDevices(result2.data)
                         } else {
                             setError("Something went wrong, please restart the app to load the devices properly")
                         }
                     }
                     is Resource.Error -> {
-                        when(result.code) {
+                        when(result2.code) {
                             400 -> { setError("Something went wrong, please restart the ap") }
                             -1 -> { setError("Internet connection error") }
                             else -> { setError("An unexpected error occurred") }
@@ -195,12 +200,22 @@ class MapScreenViewModel @Inject constructor(
     }
 
     fun removeDeviceFromDb(deviceId: Int) {
-        removeDeviceUseCase(_state.value.token, deviceId.toString())
+        val currentDeviceId = _state.value.device?.id
+        removeDeviceUseCase(credentials = token, deviceId.toString())
             .onEach { result ->
                 when (result) {
                     is Resource.Loading -> {}
                     is Resource.Success -> {
                         removeDevice(deviceId)
+                        if (deviceId == currentDeviceId) {
+                            setDevice(null)
+                            setLocationLatest(null)
+                            setLocationHistory(emptyList())
+                            setDeviceGeofenceVertices(emptyList())
+                            setShowLocationHistory(false)
+                            setShowGeofence(false)
+                            removeDevice(deviceId)
+                        }
                     }
                     is Resource.Error -> {
                         when(result.code) {
@@ -217,7 +232,7 @@ class MapScreenViewModel @Inject constructor(
         val deviceId = _state.value.device?.id
         if (deviceId != null) {
             addGeofenceUseCase(
-                credentials = _state.value.token,
+                credentials = token,
                 deviceId = deviceId.toString(),
                 vertices = _state.value.addVertices
             )
@@ -247,7 +262,7 @@ class MapScreenViewModel @Inject constructor(
     fun getGeofenceFromDb() {
         val deviceId = _state.value.device?.id
         if (deviceId != null) {
-            getGeofenceUseCase(credentials = _state.value.token, deviceId = deviceId.toString())
+            getGeofenceUseCase(credentials = token, deviceId = deviceId.toString())
                 .onEach { result ->
                     when (result) {
                         is Resource.Loading -> {}
@@ -275,7 +290,7 @@ class MapScreenViewModel @Inject constructor(
     fun removeGeofenceFromDb() {
         val deviceId = _state.value.device?.id
         if (deviceId != null) {
-            removeGeofenceUseCase(credentials = _state.value.token, deviceId = deviceId.toString())
+            removeGeofenceUseCase(credentials = token, deviceId = deviceId.toString())
                 .onEach { result ->
                     when (result) {
                         is Resource.Loading -> {}
@@ -307,7 +322,7 @@ class MapScreenViewModel @Inject constructor(
         }
     }
 
-    fun setDevice(newValue: Device) {
+    fun setDevice(newValue: Device?) {
         _state.value = state.value.copy(
             device = newValue
         )
@@ -319,7 +334,7 @@ class MapScreenViewModel @Inject constructor(
         )
     }
 
-    private fun setLocationLatest(newValue: LocationDto) {
+    fun setLocationLatest(newValue: LocationDto?) {
         _state.value = state.value.copy(
             locationLatest = newValue
         )
@@ -331,7 +346,7 @@ class MapScreenViewModel @Inject constructor(
         )
     }
 
-    private fun setDeviceGeofenceVertices(vertices: List<GeofenceVertex>) {
+    fun setDeviceGeofenceVertices(vertices: List<GeofenceVertex>) {
         _state.value = state.value.copy(
             deviceGeofenceVertices = vertices
         )
@@ -372,6 +387,33 @@ class MapScreenViewModel @Inject constructor(
     private fun setToken(newValue: String) {
         _state.value = state.value.copy(
             token = newValue
+        )
+    }
+
+    private fun setShowLocationHistory(newValue: Boolean) {
+        _state.value = state.value.copy(
+            showLocationHistory = newValue
+        )
+    }
+
+    private fun setShowGeofence(newValue: Boolean) {
+        _state.value = state.value.copy(
+            showGeofence = newValue
+        )
+    }
+
+    fun setLogout() {
+        _state.value = state.value.copy(
+            error = null,
+            message = null,
+            token = "",
+            devices = emptyList(),
+            device = null,
+            deviceGeofenceVertices = emptyList(),
+            locationLatest = null,
+            locationHistory = emptyList(),
+            showLocationHistory = false,
+            showGeofence = false
         )
     }
 }

@@ -10,12 +10,15 @@ data class MapScreenState(
     val message: String? = null,
     val token: String = "",
     val devices: List<Device> = emptyList(),
-    val cameraPositionState: CameraPositionState = CameraPositionState(), // TODO: s tymto zatial neviem co robitß
+    val cameraPositionState: CameraPositionState = CameraPositionState(),
     // Current device stuff
     val device: Device? = null,
     val deviceGeofenceVertices: List<GeofenceVertex> = emptyList(),
-    val locationLatest: LocationDto? = null,
+    var locationLatest: LocationDto? = null,
     val locationHistory: List<LocationDto> = emptyList(),
+    // Center, History & Geofence
+    var showLocationHistory: Boolean = false,
+    var showGeofence: Boolean = false,
     // Requests:
     //  addGeofence()
     val addVertices: List<GeofenceVertex> = emptyList() // TODO: toto asi vymazat

@@ -120,7 +120,7 @@ class RepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Resource.Loading<List<LocationDto>>())
-                val locations = api.getAllLocations(credentials, deviceId, limit).data
+                val locations = api.getAllLocations(credentials, deviceId, limit)
                 emit(Resource.Success<List<LocationDto>>(locations))
             } catch (e: HttpException) {
                 emit(Resource.Error<List<LocationDto>>(e.code()))

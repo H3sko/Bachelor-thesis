@@ -58,15 +58,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import bachelorThesis.app.common.DrawerContentType
 import bachelorThesis.app.common.IconResource
-import bachelorThesis.app.data.remote.dto.Device
+import bachelorThesis.app.ui.destinations.HomeScreenDestination
+import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberMarkerState
 import com.ramcosta.composedestinations.annotation.Destination
@@ -95,9 +99,13 @@ fun MapScreen(
     }
     LaunchedEffect(state.device) {
         state.device?.let { device ->
-            viewModel.getGeofenceFromDb()
             viewModel.getLocationFromDb()
-            viewModel.getAllLocationsFromDb()
+            viewModel.getAllLocationsFromDb() // TODO: toto robi problemy, vyriesit
+//            viewModel.getGeofenceFromDb()
+        } ?: run {
+            viewModel.setDeviceGeofenceVertices(emptyList())
+            viewModel.setLocationLatest(null)
+            viewModel.setLocationHistory(emptyList())
         }
     }
 
@@ -106,9 +114,10 @@ fun MapScreen(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        gesturesEnabled = true,
+        gesturesEnabled = false,
         drawerContent = {
             ModalDrawerContent(
+                navigator = navigator,
                 state = state,
                 viewModel = viewModel,
                 modifier = Modifier,
@@ -129,14 +138,19 @@ fun MapScreen(
                         drawerState,
                         name = it.name
                     )
+                } ?: run {
+                    MapScreenTopBar(
+                        localCoroutineScope,
+                        drawerState,
+                        name = "-"
+                    )
                 }
             },
             floatingActionButton = {
-                Row {
+                Row (horizontalArrangement = Arrangement.Center) {
                     FloatingActionButton(
                         onClick = {
-                            if(state.locationHistory.isNotEmpty()) viewModel.setLocationHistory(emptyList())
-                            else viewModel.getAllLocationsFromDb()
+                            localCoroutineScope.launch { state.showLocationHistory = !state.showLocationHistory }
                         },
                         Modifier.background( color =  if (state.locationHistory.isNotEmpty()) colorScheme.primary else colorScheme.secondary)
                     ) {
@@ -147,8 +161,7 @@ fun MapScreen(
                     }
                     FloatingActionButton(
                         onClick = {
-                            // TODO: showPolygon()
-                            localCoroutineScope.launch { }
+                            localCoroutineScope.launch { state.showGeofence = !state.showGeofence }
                         },
                         Modifier.background( color = colorScheme.primary)
                     ) {
@@ -183,6 +196,7 @@ fun MapScreen(
 
 @Composable
 fun ModalDrawerContent(
+    navigator: DestinationsNavigator,
     state: MapScreenState,
     viewModel: MapScreenViewModel,
     modifier: Modifier,
@@ -193,9 +207,12 @@ fun ModalDrawerContent(
     ModalDrawerSheet(modifier = modifier) {
         when (currentContent) {
             DrawerContentType.MAIN_MENU -> MainMenuContent(
+                navigator = navigator,
+                viewModel = viewModel,
                 closeDrawer = closeDrawer,
                 onNavigateToAddDevice = { onContentChange(DrawerContentType.ADD_NEW_DEVICE) },
-                onNavigateToMyDevices = { onContentChange(DrawerContentType.MY_DEVICES) }
+                onNavigateToMyDevices = { onContentChange(DrawerContentType.MY_DEVICES) },
+                onNavigateToGeofence = { onContentChange(DrawerContentType.GEOFENCE) }
             )
             DrawerContentType.MY_DEVICES -> MyDevicesContent(
                 state = state,
@@ -207,6 +224,11 @@ fun ModalDrawerContent(
                 viewModel = viewModel,
                 onBackToMenu = { onContentChange(DrawerContentType.MAIN_MENU) }
             )
+            DrawerContentType.GEOFENCE -> GeofenceContent(
+                state = state,
+                viewModel = viewModel,
+                onBackToMenu = { onContentChange(DrawerContentType.MAIN_MENU) }
+            )
         }
     }
 }
@@ -214,9 +236,12 @@ fun ModalDrawerContent(
 
 @Composable
 fun MainMenuContent(
+    navigator: DestinationsNavigator,
+    viewModel: MapScreenViewModel,
     closeDrawer: () -> Unit,
     onNavigateToAddDevice: () -> Unit,
-    onNavigateToMyDevices: () -> Unit
+    onNavigateToMyDevices: () -> Unit,
+    onNavigateToGeofence: () -> Unit
 ) {
     NavigationDrawerItem(
         onClick = { closeDrawer() },
@@ -238,9 +263,18 @@ fun MainMenuContent(
     )
     HorizontalDivider()
     NavigationDrawerItem(
+        label = { Text(text = "Geofence") },
+        selected = false,
+        onClick = { onNavigateToGeofence() }
+    )
+    HorizontalDivider()
+    NavigationDrawerItem(
         label = { Text(text = "Logout") },
         selected = false,
-        onClick = { closeDrawer() }
+        onClick = { // TODO: WIP
+            viewModel.setLogout()
+            navigator.navigate(HomeScreenDestination)
+        }
     )
 }
 
@@ -324,10 +358,9 @@ fun MyDevicesContent(
                     onDelete = { viewModel.removeDeviceFromDb(device.id) },
                     onItemClicked = {
                         viewModel.setDevice(device)
-
-                        viewModel.updateCameraPosition()
+//                        viewModel.updateCameraPosition() // TODO: porozmyslat a dorobit
                         onBackToMenu()
-                    } // TODO: ked sa zmeni device, mala by sa okamzite aktualizovat jeho aktualna poloha a stiahnut historia poloh + geofence
+                    }
                 )
                 HorizontalDivider()
             }
@@ -335,7 +368,6 @@ fun MyDevicesContent(
     }
 }
 
-// TODO: treba otestovat uz so zapnutou databazou
 @Composable
 fun AddNewDeviceContent(
     state: MapScreenState,
@@ -354,9 +386,21 @@ fun AddNewDeviceContent(
     )
     HorizontalDivider()
 
-    Text(text = "Add New Device", style = MaterialTheme.typography.bodyLarge)
-
     Column(modifier = Modifier.padding(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Add New Device",
+                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         TextField(
             value = deviceName,
             onValueChange = { deviceName = it },
@@ -403,6 +447,51 @@ fun AddNewDeviceContent(
     }
 }
 
+@Composable
+fun GeofenceContent(
+    state: MapScreenState,
+    viewModel: MapScreenViewModel,
+    onBackToMenu: () -> Unit
+) {
+    NavigationDrawerItem(
+        label = { Text(text = "Back to Menu") },
+        icon = { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) },
+        selected = false,
+        onClick = { onBackToMenu() }
+    )
+    HorizontalDivider()
+
+    if (state.device != null) {
+        if (state.deviceGeofenceVertices.isEmpty()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Add Geofence for ${state.device.name}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // TODO
+                // Add geofence-specific content here (e.g., form fields to add geofence)
+                // Example: Input fields, buttons, etc.
+            }
+        } else {
+            SwipeableNavigationDrawerItem(
+                text = "${state.device.name}'s Geofence",
+                onDelete = { viewModel.removeGeofenceFromDb() },
+                onItemClicked = { /* TODO */ }
+            )
+        }
+    } else {
+        Text(
+            text = "No device selected.",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+    }
+}
 
 
 
@@ -449,7 +538,7 @@ private fun MapScreenContent(
     val uiSettings = remember {
         MapUiSettings(
             zoomGesturesEnabled = true,
-            zoomControlsEnabled = false
+            zoomControlsEnabled = true
         )
     }
 
@@ -461,11 +550,20 @@ private fun MapScreenContent(
             updateCameraCallback()
         }
     ) {
-        if (state.locationLatest != null) {
-            Marker(rememberMarkerState(position = LatLng(state.locationLatest.latitude, state.locationLatest.longitude)))
+        if (state.locationLatest != null) { // TODO: pridat nejaku icon mozno
+            Marker(state = rememberMarkerState(position = LatLng(state.locationLatest!!.latitude, state.locationLatest!!.longitude)))
         }
-        if (state.locationHistory.isNotEmpty()) {
+        if (state.locationHistory.isNotEmpty() && state.showLocationHistory) {
             Polyline(points = state.locationHistory.map { LatLng(it.latitude, it.longitude) })
+        }
+        if (state.deviceGeofenceVertices.isNotEmpty() && state.showGeofence) {
+            Polygon(
+                points = state.deviceGeofenceVertices.map { LatLng(it.latitude, it.longitude) },
+                fillColor = Color.Transparent,
+                strokeColor = Color(green = 178, red = 102, blue = 255),
+                strokeJointType = JointType.BEVEL
+            )
+            // TODO: setError ak showGeofence true ale on neexistuje
         }
     }
 }

@@ -9,5 +9,6 @@ const val MaxZoom = 20f
 enum class DrawerContentType {
     MAIN_MENU,
     MY_DEVICES,
-    ADD_NEW_DEVICE
+    ADD_NEW_DEVICE,
+    GEOFENCE
 }

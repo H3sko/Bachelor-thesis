@@ -71,9 +71,12 @@ class LocationsService : ILocationsService {
         }
     }
 
-    override suspend fun getAll(deviceId: Int): List<LocationWithId> {
+    override suspend fun getAll(deviceId: Int, limit: Int): List<LocationWithId> {
         return dbQuery {
-            Locations.selectAll().where { Locations.deviceId eq deviceId }
+            Locations.selectAll()
+                .where { Locations.deviceId eq deviceId }
+                .orderBy(column = Locations.timestamp, order = SortOrder.DESC)
+                .limit(limit)
                 .map {
                     LocationWithId(
                         it[Locations.id].value,

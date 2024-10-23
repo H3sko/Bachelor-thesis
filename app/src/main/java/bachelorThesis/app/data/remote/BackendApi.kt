@@ -5,7 +5,6 @@ import bachelorThesis.app.data.remote.dto.DeviceJson
 import bachelorThesis.app.data.remote.dto.GeofenceDto
 import bachelorThesis.app.data.remote.dto.GeofenceJson
 import bachelorThesis.app.data.remote.dto.LocationDto
-import bachelorThesis.app.data.remote.dto.LocationsResponse
 import bachelorThesis.app.data.remote.dto.TokenJson
 import bachelorThesis.app.data.remote.dto.UserJson
 import retrofit2.http.Body
@@ -42,7 +41,7 @@ interface BackendApi {
     suspend fun getLocation(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): LocationDto
 
     @GET("location/getAll/{deviceId}")
-    suspend fun getAllLocations(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String, @Query("limit") limit: Int): LocationsResponse
+    suspend fun getAllLocations(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String, @Query("limit") limit: Int): List<LocationDto>
 
     @GET("geofence/device/{deviceId}")
     suspend fun getGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): GeofenceDto

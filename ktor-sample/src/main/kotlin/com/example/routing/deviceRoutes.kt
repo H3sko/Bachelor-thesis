@@ -50,7 +50,7 @@ fun Route.devicesDefault(jwtService: JWTService) {
                     val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
                         ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
                     val userId = username?.let { it1 -> userService.getUserId(it1) }
-                    val deviceIsInDatabase = userId?.let { _ -> deviceService.inDatabaseByName(deviceCredentials.name) }
+                    val deviceIsInDatabase = userId?.let { _ -> deviceService.inDatabaseByNameAndOwner(deviceCredentials.name, userId) }
 
                     if (deviceIsInDatabase != null) {
                         if (deviceIsInDatabase.not()) {
@@ -62,7 +62,6 @@ fun Route.devicesDefault(jwtService: JWTService) {
                     }
                 } else {
                     call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
-
                 }
             }
         }

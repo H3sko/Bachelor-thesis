@@ -61,7 +61,7 @@ class DeviceService : IDeviceService {
         }
     }
 
-    override suspend fun inDatabaseByName(deviceName: String): Boolean {
+    override suspend fun inDatabaseByNameAndOwner(deviceName: String, userId: Int): Boolean {
         return dbQuery {
             Devices.selectAll()
                 .where { Devices.name eq deviceName}

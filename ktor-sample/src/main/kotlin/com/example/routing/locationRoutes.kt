@@ -55,9 +55,11 @@ fun Route.locationsDefault(jwtService: JWTService) {
                 val userId = username?.let { it1 -> userService.getUserId(it1) }
                 val device = deviceId?.let { it1 -> deviceService.readById(it1) }
 
+                val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: Int.MAX_VALUE
+
                 if (device != null) {
                     if (device.userId == userId) {
-                        val locations = locationsService.getAll(deviceId)
+                        val locations = locationsService.getAll(deviceId, limit)
                         if (locations.isNotEmpty()) {
                             val locationDtos: List<LocationDto> = locations.map { loc ->
                                 LocationDto(
@@ -149,9 +151,10 @@ fun Route.locationsAdmin() {
             route("/{deviceId}") {
                 get {
                     val deviceId = call.parameters["deviceId"]?.toInt()
+                    val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: Int.MAX_VALUE
 
                     if (deviceId != null) {
-                        val locations = locationsService.getAll(deviceId)
+                        val locations = locationsService.getAll(deviceId, limit)
                         if (locations.isNotEmpty()) {
                             call.respond(HttpStatusCode.OK, locations)
                         } else {

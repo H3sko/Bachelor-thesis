@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import bachelorThesis.app.ui.destinations.DirectionDestination
-import bachelorThesis.app.ui.destinations.MapScreenDestination
+import bachelorThesis.app.ui.destinations.LoginScreenDestination
 import bachelorThesis.app.ui.destinations.RegistrationScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -110,7 +110,8 @@ fun Title(
 
 @Composable
 fun DestinationButtons(
-    navigator: DestinationsNavigator, modifier: Modifier
+    navigator: DestinationsNavigator,
+    modifier: Modifier
 ) {
     Column(
         modifier = modifier,
@@ -122,9 +123,8 @@ fun DestinationButtons(
         ){
             HomeScreenButton(
                 value = "Login",
-                // TODO: docasne na testovanie
-//                destination = LoginScreenDestination,
-                destination = MapScreenDestination,
+                destination = LoginScreenDestination,
+//                destination = MapScreenDestination, // TODO: ked chcem testovat mapu bez loginu
                 navigator = navigator,
                 modifier = Modifier
                     .fillMaxWidth(fraction = 0.5f)

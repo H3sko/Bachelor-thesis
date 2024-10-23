@@ -15,6 +15,11 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTIwNzk2N30.Qw_jSIjJVIgszwOlFIdDEHxB0we0LYS81hnlEXppKtc
 
 ###
+GET http://127.0.0.1:8080/location/getAll/6
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTIwNzk2N30.Qw_jSIjJVIgszwOlFIdDEHxB0we0LYS81hnlEXppKtc
+
+###
 POST http://127.0.0.1:8080/location/add
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MTUyMDgxNzB9.9E6kCA6ZchPTCJLT9GHKBkxEbU6bkCsTN27anIcBEXo

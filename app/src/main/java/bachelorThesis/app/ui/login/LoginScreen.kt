@@ -101,7 +101,7 @@ fun LoginScreen(
 }
 
 @Composable
-fun SuccessfulLogin(
+fun SuccessfulLogin( // TODO: toto som pouzival asi len na testovanie takze mozno vymazat
     navigator: DestinationsNavigator,
     logOut: () -> Unit
 ) {

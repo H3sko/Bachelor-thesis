@@ -20,5 +20,5 @@ fun Application.module() {
 
     configureAuthentication(jwtService)
     configureRouting(jwtService)
-//    configureQuartzScheduler()
+    configureQuartzScheduler()
 }
