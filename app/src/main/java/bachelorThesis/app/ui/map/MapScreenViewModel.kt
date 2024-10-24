@@ -311,7 +311,13 @@ class MapScreenViewModel @Inject constructor(
             setError("Something went wrong, please try again")
         }
     }
-
+//   TODO: WIP, otestovat
+    fun onGeofencePointAdded(latLng: LatLng) {
+        val currentVertices = _state.value.deviceGeofenceVertices.toMutableList()
+        currentVertices.add(GeofenceVertex(latLng.latitude, latLng.longitude)) // TODO: dorobit
+        _state.value = _state.value.copy(deviceGeofenceVertices = currentVertices)
+}
+//
     suspend fun updateCameraPosition() {
         if (state.value.locationLatest != null) {
             state.value.cameraPositionState.animate(

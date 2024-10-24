@@ -189,9 +189,19 @@ fun MapScreen(
                         )
                     }
                 }
-            }
+            },
+            // TODO : s tymto nieco urobit
+//            if (state.AddingGeofence) {
+//                FloatingActionButton(
+//                    onClick = { /* Implement geofence creation action */ },
+//                    modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+//                    content = {
+//                        Icon(Icons.Default.Add, contentDescription = "Create Geofence")
+//                    }
+//                )
+//            }
         ) {
-            MapScreenContent(
+            MapScreenContent( // TODO: toto dorobit
                 state,
                 viewModel
             ) {}
@@ -562,6 +572,11 @@ private fun MapScreenContent(
         uiSettings = uiSettings,
         onMapLoaded = {
             updateCameraCallback()
+        },
+        onMapClick = { latLng -> // TODO: otestovat
+            if (state.addingGeofence) {
+                viewModel.onGeofencePointAdded(latLng)
+            }
         }
     ) {
         if (state.locationLatest != null) { // TODO: pridat nejaku icon mozno
