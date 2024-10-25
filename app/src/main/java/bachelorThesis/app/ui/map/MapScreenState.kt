@@ -19,8 +19,7 @@ data class MapScreenState(
     val cameraPositionState: CameraPositionState = CameraPositionState(),
     var showLocationHistory: Boolean = false,
     var showGeofence: Boolean = false,
+    // Creating geofence
+    var addedGeofenceVertices: List<GeofenceVertex> = emptyList(),
     var addingGeofence: Boolean = false,
-    // Requests:
-    //  addGeofence()
-    val addVertices: List<GeofenceVertex> = emptyList() // TODO: toto asi vymazat
 )

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -143,65 +144,95 @@ fun MapScreen(
                     MapScreenTopBar(
                         localCoroutineScope,
                         drawerState,
-                        name = "-"
+                        name = ""
                     )
                 }
             },
             floatingActionButton = {
-                Row (horizontalArrangement = Arrangement.Center) {
-                    FloatingActionButton(
-                        onClick = {
-                            localCoroutineScope.launch {
-                                viewModel.setShowLocationHistory(!state.showLocationHistory)
-                            }
-                        },
-                        Modifier.background( color =  if (state.locationHistory.isNotEmpty()) colorScheme.primary else colorScheme.secondary)
+                if (!state.addingGeofence) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(id = IconResource.Route.id ),
-                            contentDescription = "polyline_icon"
-                        )
+                        FloatingActionButton(
+                            onClick = {
+                                localCoroutineScope.launch {
+                                    viewModel.setShowLocationHistory(!state.showLocationHistory)
+                                }
+                            },
+                            containerColor = if (state.locationHistory.isNotEmpty()) colorScheme.primary else colorScheme.secondary // TODO: dobra myslienka ale prerobit tie colorSchemes preboha
+                        ) {
+                            Icon(
+                                painter = painterResource(id = IconResource.Route.id),
+                                contentDescription = "polyline_icon"
+                            )
+                        }
+
+                        FloatingActionButton(
+                            onClick = {
+                                localCoroutineScope.launch {
+                                    viewModel.setShowGeofence(!state.showGeofence)
+                                }
+                            },
+                            containerColor = colorScheme.primary
+                        ) {
+                            Icon(
+                                painter = painterResource(id = IconResource.Polygon.id),
+                                contentDescription = "geofence_icon"
+                            )
+                        }
+
+                        FloatingActionButton(
+                            onClick = {
+                                localCoroutineScope.launch {
+                                    viewModel.updateCameraPosition()
+                                }
+                            },
+                            containerColor = colorScheme.primary
+                        ) {
+                            Icon(
+                                painter = painterResource(id = IconResource.Place.id),
+                                contentDescription = "center_icon"
+                            )
+                        }
                     }
-                    FloatingActionButton(
-                        onClick = {
-                            localCoroutineScope.launch { 
-                                viewModel.setShowGeofence(!state.showGeofence)
-                            }
-                        },
-                        Modifier.background( color = colorScheme.primary)
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(id = IconResource.Polygon.id ),
-                            contentDescription = "center_icon",
-                        )
-                    }
-                    FloatingActionButton(
-                        onClick = {
-                            localCoroutineScope.launch { 
-                                viewModel.updateCameraPosition() 
-                            }
-                        },
-                        Modifier.background( color = colorScheme.primary)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = IconResource.Place.id ),
-                            contentDescription = "center_icon",
-                        )
+                        FloatingActionButton(
+                            onClick = {
+                                if (state.addedGeofenceVertices.size < 3) {
+                                    viewModel.setError("Select at least 3 points")
+                                } else {
+                                    viewModel.addGeofenceToDb()
+                                }
+                            },
+                            containerColor = Color.Green,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Create", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
+
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        FloatingActionButton(
+                            onClick = {
+                                viewModel.setAddedGeofenceVertices(emptyList())
+                                viewModel.setAddingGeofence(false)
+                            },
+                            containerColor = Color.Red,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Delete", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
-            },
-            // TODO : s tymto nieco urobit
-//            if (state.AddingGeofence) {
-//                FloatingActionButton(
-//                    onClick = { /* Implement geofence creation action */ },
-//                    modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-//                    content = {
-//                        Icon(Icons.Default.Add, contentDescription = "Create Geofence")
-//                    }
-//                )
-//            }
+            }
+
         ) {
-            MapScreenContent( // TODO: toto dorobit
+            MapScreenContent( // TODO: toto dorobit s tym updateCameraposition()
                 state,
                 viewModel
             ) {}
@@ -244,7 +275,8 @@ fun ModalDrawerContent(
             DrawerContentType.GEOFENCE -> GeofenceContent(
                 state = state,
                 viewModel = viewModel,
-                onBackToMenu = { onContentChange(DrawerContentType.MAIN_MENU) }
+                onBackToMenu = { onContentChange(DrawerContentType.MAIN_MENU) },
+                closeDrawer = closeDrawer
             )
         }
     }
@@ -472,7 +504,8 @@ fun AddNewDeviceContent(
 fun GeofenceContent(
     state: MapScreenState,
     viewModel: MapScreenViewModel,
-    onBackToMenu: () -> Unit
+    onBackToMenu: () -> Unit,
+    closeDrawer: () -> Unit,
 ) {
     NavigationDrawerItem(
         label = { Text(text = "Back to Menu") },
@@ -484,29 +517,42 @@ fun GeofenceContent(
 
     if (state.device != null) {
         if (state.deviceGeofenceVertices.isEmpty()) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "Add Geofence for ${state.device.name}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = {
+                        closeDrawer()
+                        state.addingGeofence = true
+                    },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // TODO
-                // Add geofence-specific content here (e.g., form fields to add geofence)
-                // Example: Input fields, buttons, etc.
+                ) {
+                    Text(text = "Create Geofence")
+                }
             }
-        } else {
+        }
+        else {
             SwipeableNavigationDrawerItem(
                 text = "${state.device.name}'s Geofence",
                 onDelete = { viewModel.removeGeofenceFromDb() },
-                onItemClicked = { /* TODO */ }
+                onItemClicked = {
+                    viewModel.setShowGeofence(!state.showGeofence)
+                    closeDrawer()
+                }
             )
         }
     } else {
-        Column {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             Text(
                 text = "No device selected.",
                 style = MaterialTheme.typography.bodyLarge,

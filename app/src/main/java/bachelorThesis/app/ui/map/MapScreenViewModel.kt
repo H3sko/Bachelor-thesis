@@ -234,13 +234,15 @@ class MapScreenViewModel @Inject constructor(
             addGeofenceUseCase(
                 credentials = token,
                 deviceId = deviceId.toString(),
-                vertices = _state.value.addVertices
+                vertices = _state.value.addedGeofenceVertices
             )
                 .onEach { result ->
                     when (result) {
                         is Resource.Loading -> {}
                         is Resource.Success -> {
-                            setDeviceGeofenceVertices(_state.value.addVertices)
+                            setDeviceGeofenceVertices(_state.value.addedGeofenceVertices)
+                            setAddingGeofence(false)
+                            setAddedGeofenceVertices(emptyList())
                         }
                         is Resource.Error -> {
                             when (result.code) {
@@ -405,6 +407,18 @@ class MapScreenViewModel @Inject constructor(
     fun setShowGeofence(newValue: Boolean) {
         _state.value = state.value.copy(
             showGeofence = newValue
+        )
+    }
+
+    fun setAddingGeofence(newValue: Boolean) {
+        _state.value = state.value.copy(
+            addingGeofence = newValue
+        )
+    }
+
+    fun setAddedGeofenceVertices(newValue: List<GeofenceVertex>) {
+        _state.value = state.value.copy(
+            addedGeofenceVertices = newValue
         )
     }
 
