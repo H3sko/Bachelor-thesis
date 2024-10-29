@@ -102,7 +102,7 @@ fun MapScreen(
         state.device?.let { device ->
             viewModel.getLocationFromDb()
             viewModel.getAllLocationsFromDb()
-//            viewModel.getGeofenceFromDb()
+            viewModel.getGeofenceFromDb()
             viewModel.updateCameraPosition() // TODO: toto nefunguje
         } ?: run {
             viewModel.setDeviceGeofenceVertices(emptyList())
@@ -151,8 +151,10 @@ fun MapScreen(
             floatingActionButton = {
                 if (!state.addingGeofence) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                        horizontalArrangement = Arrangement.Center, // TODO: .spacedBy(16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
                     ) {
                         FloatingActionButton(
                             onClick = {
@@ -199,11 +201,13 @@ fun MapScreen(
                 } else {
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
                     ) {
                         FloatingActionButton(
                             onClick = {
-                                if (state.addedGeofenceVertices.size < 3) {
+                                if (state.addedGeofenceVertices.size < 3) { // TODO s tymto mozno bude chyba
                                     viewModel.setError("Select at least 3 points")
                                 } else {
                                     viewModel.addGeofenceToDb()
@@ -320,7 +324,7 @@ fun MainMenuContent(
     NavigationDrawerItem(
         label = { Text(text = "Logout") },
         selected = false,
-        onClick = { // TODO: WIP
+        onClick = {
             viewModel.setLogout()
             navigator.navigate(HomeScreenDestination)
         }
@@ -526,8 +530,8 @@ fun GeofenceContent(
             ) {
                 Button(
                     onClick = {
+                        viewModel.setAddingGeofence(true)
                         closeDrawer()
-                        state.addingGeofence = true
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
@@ -621,12 +625,12 @@ private fun MapScreenContent(
         },
         onMapClick = { latLng -> // TODO: otestovat
             if (state.addingGeofence) {
-                viewModel.onGeofencePointAdded(latLng)
+                viewModel.addGeofencePoint(latLng)
             }
         }
     ) {
         if (state.locationLatest != null) { // TODO: pridat nejaku icon mozno
-            Marker(state = rememberMarkerState(position = LatLng(state.locationLatest!!.latitude, state.locationLatest!!.longitude)))
+            Marker(state = rememberMarkerState(position = LatLng(state.locationLatest!!.latitude, state.locationLatest!!.longitude))) // TODO: upravit marker nech je krajsi
         }
         if (state.locationHistory.isNotEmpty()) {
             if (state.showLocationHistory) {
@@ -637,10 +641,17 @@ private fun MapScreenContent(
             Polygon(
                 points = state.deviceGeofenceVertices.map { LatLng(it.latitude, it.longitude) },
                 fillColor = Color.Transparent,
-                strokeColor = Color(green = 178, red = 102, blue = 255),
+                strokeColor = Color.Red,
                 strokeJointType = JointType.BEVEL
             )
             // TODO: setError ak showGeofence true ale on neexistuje
+        }
+        if (state.addedGeofenceVertices.isNotEmpty()) {
+            if (state.addingGeofence) {
+                for (point in state.addedGeofenceVertices) {
+                    Marker(state = rememberMarkerState(position = LatLng(point.latitude, point.longitude))) // TODO: iny marker
+                }
+            }
         }
     }
 }

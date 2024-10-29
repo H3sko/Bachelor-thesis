@@ -9,7 +9,7 @@ import javax.inject.Inject
 class AddGeofenceUseCase @Inject constructor(
     private val repository: Repository
 )  {
-    operator fun invoke(credentials: String, deviceId: String, vertices: List<GeofenceVertex>): Flow<Resource<Boolean>> {
+    operator fun invoke(credentials: String, deviceId: String, vertices: List<GeofenceVertex>): Flow<Resource<String>> {
         return repository.addGeofence(credentials, deviceId, vertices)
     }
 }

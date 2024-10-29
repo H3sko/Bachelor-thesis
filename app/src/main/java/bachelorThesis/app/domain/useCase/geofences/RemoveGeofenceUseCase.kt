@@ -8,7 +8,7 @@ import javax.inject.Inject
 class RemoveGeofenceUseCase @Inject constructor(
     private val repository: Repository
 )  {
-    operator fun invoke(credentials: String, deviceId: String): Flow<Resource<Boolean>> {
+    operator fun invoke(credentials: String, deviceId: String): Flow<Resource<String>> {
         return repository.removeGeofence(credentials, deviceId)
     }
 }

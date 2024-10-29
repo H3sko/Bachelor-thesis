@@ -1,11 +1,11 @@
 package bachelorThesis.app.data.repository
 
+import android.util.Log
 import bachelorThesis.app.common.Resource
 import bachelorThesis.app.data.remote.BackendApi
 import bachelorThesis.app.data.remote.dto.Device
 import bachelorThesis.app.data.remote.dto.DeviceCredentials
 import bachelorThesis.app.data.remote.dto.DeviceJson
-import bachelorThesis.app.data.remote.dto.GeofenceJson
 import bachelorThesis.app.data.remote.dto.GeofenceVertex
 import bachelorThesis.app.data.remote.dto.LocationDto
 import bachelorThesis.app.data.remote.dto.TokenJson
@@ -135,7 +135,7 @@ class RepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Resource.Loading<List<GeofenceVertex>>())
-                val vertices = api.getGeofence(credentials, deviceId).vertices
+                val vertices = api.getGeofence(credentials, deviceId)
                 emit(Resource.Success<List<GeofenceVertex>>(vertices))
             } catch (e: HttpException) {
                 emit(Resource.Error<List<GeofenceVertex>>(e.code()))
@@ -146,32 +146,34 @@ class RepositoryImpl @Inject constructor(
         }
     }
 
-    override fun addGeofence(credentials: String, deviceId: String, vertices: List<GeofenceVertex>): Flow<Resource<Boolean>> {
+    override fun addGeofence(credentials: String, deviceId: String, vertices: List<GeofenceVertex>): Flow<Resource<String>> {
         return flow {
             try {
-                emit(Resource.Loading<Boolean>())
-                val created = api.addGeofence(credentials, deviceId, GeofenceJson(vertices = vertices))
-                emit(Resource.Success<Boolean>(created))
+                emit(Resource.Loading<String>())
+                val created = api.addGeofence(credentials, deviceId, vertices)
+                emit(Resource.Success<String>(created.message))
             } catch (e: HttpException) {
-                emit(Resource.Error<Boolean>(e.code()))
+                emit(Resource.Error<String>(e.code()))
             }
             catch (e: IOException) {
-                emit(Resource.Error<Boolean>(-1))
+                emit(Resource.Error<String>(-1))
             }
         }
     }
 
-    override fun removeGeofence(credentials: String, deviceId: String): Flow<Resource<Boolean>> {
+    override fun removeGeofence(credentials: String, deviceId: String): Flow<Resource<String>> {
         return flow {
             try {
-                emit(Resource.Loading<Boolean>())
+                emit(Resource.Loading<String>())
+                Log.d("val deleted = api.removeGeofence(credentials, deviceId)", "pred")
                 val deleted = api.removeGeofence(credentials, deviceId)
-                emit(Resource.Success<Boolean>(deleted))
+                Log.d("val deleted = api.removeGeofence(credentials, deviceId)", "po")
+                emit(Resource.Success<String>(deleted.message))
             } catch (e: HttpException) {
-                emit(Resource.Error<Boolean>(e.code()))
+                emit(Resource.Error<String>(e.code()))
             }
             catch (e: IOException) {
-                emit(Resource.Error<Boolean>(-1))
+                emit(Resource.Error<String>(-1))
             }
         }
     }

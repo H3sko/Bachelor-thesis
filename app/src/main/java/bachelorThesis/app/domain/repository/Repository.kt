@@ -26,7 +26,7 @@ interface Repository {
 
     fun getGeofence(credentials: String, deviceId: String): Flow<Resource<List<GeofenceVertex>>>
 
-    fun addGeofence(credentials: String, deviceId: String, vertices: List<GeofenceVertex>): Flow<Resource<Boolean>>
+    fun addGeofence(credentials: String, deviceId: String, vertices: List<GeofenceVertex>): Flow<Resource<String>>
 
-    fun removeGeofence(credentials: String, deviceId: String): Flow<Resource<Boolean>>
+    fun removeGeofence(credentials: String, deviceId: String): Flow<Resource<String>>
 }

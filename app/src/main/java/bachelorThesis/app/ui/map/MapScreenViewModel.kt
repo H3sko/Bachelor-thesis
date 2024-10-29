@@ -67,9 +67,7 @@ class MapScreenViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-//    TODO: vyzera byt done, treba otestovat, ale najprv spravit ten vyber devicov
-
-    public fun getLocationFromDb() {
+    fun getLocationFromDb() {
         setLocationLatest(null)
         val deviceId = _state.value.device?.id
         if (deviceId != null) {
@@ -134,15 +132,10 @@ class MapScreenViewModel @Inject constructor(
             }
     }
 
-//    TODO: ? appendPath() ako appendNewLocationsHistory() (ak by som miesto vzdy vytiahnutia latest 10 locactions chcel po jednej updatovat)
-
-//    TODO: este nezacate
-
     private fun getJwtToken() {
         getJwtTokenUseCase()
             .onEach { result ->
                 if (result.isEmpty()) {
-                    Log.i(TAG, "Token not saved in the dataStore")
                     setError("Something went wrong, please logIn again")
                 } else {
                     setToken(result)
@@ -262,6 +255,7 @@ class MapScreenViewModel @Inject constructor(
     }
 
     fun getGeofenceFromDb() {
+        setDeviceGeofenceVertices(emptyList())
         val deviceId = _state.value.device?.id
         if (deviceId != null) {
             getGeofenceUseCase(credentials = token, deviceId = deviceId.toString())
@@ -297,6 +291,8 @@ class MapScreenViewModel @Inject constructor(
                     when (result) {
                         is Resource.Loading -> {}
                         is Resource.Success -> {
+                            setShowGeofence(false)
+                            Log.d("removeGeofence()", "sme tu")
                             removeGeofence()
                         }
                         is Resource.Error -> {
@@ -313,13 +309,14 @@ class MapScreenViewModel @Inject constructor(
             setError("Something went wrong, please try again")
         }
     }
-//   TODO: WIP, otestovat
-    fun onGeofencePointAdded(latLng: LatLng) {
-        val currentVertices = _state.value.deviceGeofenceVertices.toMutableList()
-        currentVertices.add(GeofenceVertex(latLng.latitude, latLng.longitude)) // TODO: dorobit
-        _state.value = _state.value.copy(deviceGeofenceVertices = currentVertices)
+
+    fun addGeofencePoint(latLng: LatLng) {
+        val currentVertices = _state.value.addedGeofenceVertices.toMutableList()
+        currentVertices.add(GeofenceVertex(latLng.latitude, latLng.longitude))
+        _state.value = _state.value.copy(addedGeofenceVertices = emptyList())
+        _state.value = _state.value.copy(addedGeofenceVertices = currentVertices)
 }
-//
+
     suspend fun updateCameraPosition() {
         if (state.value.locationLatest != null) {
             state.value.cameraPositionState.animate(

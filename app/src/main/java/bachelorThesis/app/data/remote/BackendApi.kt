@@ -2,9 +2,9 @@ package bachelorThesis.app.data.remote
 
 import bachelorThesis.app.data.remote.dto.DeviceDto
 import bachelorThesis.app.data.remote.dto.DeviceJson
-import bachelorThesis.app.data.remote.dto.GeofenceDto
-import bachelorThesis.app.data.remote.dto.GeofenceJson
+import bachelorThesis.app.data.remote.dto.GeofenceVertex
 import bachelorThesis.app.data.remote.dto.LocationDto
+import bachelorThesis.app.data.remote.dto.Response
 import bachelorThesis.app.data.remote.dto.TokenJson
 import bachelorThesis.app.data.remote.dto.UserJson
 import retrofit2.http.Body
@@ -44,12 +44,12 @@ interface BackendApi {
     suspend fun getAllLocations(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String, @Query("limit") limit: Int): List<LocationDto>
 
     @GET("geofence/device/{deviceId}")
-    suspend fun getGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): GeofenceDto
+    suspend fun getGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): List<GeofenceVertex>
 
     @Headers("Content-Type: application/json")
     @POST("geofence/add/{deviceId}")
-    suspend fun addGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String, @Body vertices: GeofenceJson): Boolean
+    suspend fun addGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String, @Body vertices: List<GeofenceVertex>): Response
 
     @DELETE("geofence/delete/device/{deviceId}")
-    suspend fun removeGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): Boolean
+    suspend fun removeGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): Response
 }

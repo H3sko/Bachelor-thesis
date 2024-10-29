@@ -25,7 +25,7 @@ fun Route.geofencesDefault(jwtService: JWTService) {
             post {
                 val deviceId = call.parameters["deviceId"]?.toInt()
                 val vertices = call.receive<List<GeofenceVertex>>()
-                if (vertices.size == 3) {
+                if (vertices.size >= 3) {
                     val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
                         ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
                     val userId = username?.let { it1 -> userService.getUserId(it1) }
@@ -38,18 +38,18 @@ fun Route.geofencesDefault(jwtService: JWTService) {
                                 for (vertex in vertices) {
                                     geofenceVerticesService.create(ExposedGeofenceVertices(geofenceId, vertex.latitude, vertex.longitude))
                                 }
-                                call.respond(HttpStatusCode.OK, "Geofence created")
+                                call.respond(HttpStatusCode.OK, mapOf("message" to "Geofence created"))
                             } else {
-                                call.respond(HttpStatusCode.Conflict, "This device already has a geofence")
+                                call.respond(HttpStatusCode.Conflict, mapOf("message" to "This device already has a geofence"))
                             }
                         } else {
-                            call.respond(HttpStatusCode.Unauthorized, "Device $deviceId belongs to other user")
+                            call.respond(HttpStatusCode.Unauthorized, mapOf("message" to "Device $deviceId belongs to other user"))
                         }
                     } else {
-                        call.respond(HttpStatusCode.NotFound, "Device $deviceId not found")
+                        call.respond(HttpStatusCode.NotFound, mapOf("message" to "Device $deviceId not found"))
                     }
                 } else {
-                    call.respond(HttpStatusCode.BadRequest, "Geofence needs at least 3 vertices")
+                    call.respond(HttpStatusCode.BadRequest, mapOf("message" to "Geofence needs at least 3 vertices"))
 
                 }
             }
@@ -90,12 +90,12 @@ fun Route.geofencesDefault(jwtService: JWTService) {
                 if (device != null){
                     if (device.userId == userId) {
                         geofenceService.removeGeofence(deviceId)
-                        call.respond(HttpStatusCode.OK, "Device $deviceId deleted")
+                        call.respond(HttpStatusCode.OK, mapOf("message" to "Device $deviceId deleted"))
                     } else {
-                        call.respond(HttpStatusCode.Unauthorized, "Device $deviceId belongs to other user")
+                        call.respond(HttpStatusCode.Unauthorized, mapOf("message" to "Device $deviceId belongs to other user"))
                     }
                 } else {
-                    call.respond(HttpStatusCode.NotFound, "Device $deviceId not found")
+                    call.respond(HttpStatusCode.NotFound, mapOf("message" to "Device $deviceId not found"))
                 }
             }
         }

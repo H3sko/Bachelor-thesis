@@ -87,3 +87,6 @@ data class TokenJson(
     @SerializedName("token") val token: String?
 )
 
+@Keep
+data class Response(val message: String)
+
