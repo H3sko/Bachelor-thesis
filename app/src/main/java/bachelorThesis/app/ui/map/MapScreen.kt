@@ -103,7 +103,7 @@ fun MapScreen(
             viewModel.getLocationFromDb()
             viewModel.getAllLocationsFromDb()
             viewModel.getGeofenceFromDb()
-            viewModel.updateCameraPosition() // TODO: toto nefunguje
+            localCoroutineScope.launch { viewModel.updateCameraPosition() } // TODO: toto nefunguje
         } ?: run {
             viewModel.setDeviceGeofenceVertices(emptyList())
             viewModel.setLocationLatest(null)
@@ -207,7 +207,7 @@ fun MapScreen(
                     ) {
                         FloatingActionButton(
                             onClick = {
-                                if (state.addedGeofenceVertices.size < 3) { // TODO s tymto mozno bude chyba
+                                if (state.addedGeofenceVertices.size < 3) {
                                     viewModel.setError("Select at least 3 points")
                                 } else {
                                     viewModel.addGeofenceToDb()
@@ -236,10 +236,10 @@ fun MapScreen(
             }
 
         ) {
-            MapScreenContent( // TODO: toto dorobit s tym updateCameraposition()
-                state,
-                viewModel
-            ) {}
+            MapScreenContent(
+                state = state,
+                viewModel = viewModel
+            )
         }
     }
 
@@ -382,46 +382,6 @@ fun SwipeableNavigationDrawerItem(
 }
 
 @Composable
-fun MyDevicesContent(
-    state: MapScreenState,
-    viewModel: MapScreenViewModel,
-    onBackToMenu: () -> Unit,
-    closeDrawer: () -> Unit,
-) {
-    NavigationDrawerItem(
-        label = { Text(text = "Back to Menu") },
-        icon = { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) },
-        selected = false,
-        onClick = { onBackToMenu() }
-    )
-    HorizontalDivider()
-
-    if ( state.devices.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "No Devices", style = MaterialTheme.typography.bodyLarge)
-        }
-    } else {
-        LazyColumn {
-            items(state.devices, key = { device -> device.id }) { device ->
-                SwipeableNavigationDrawerItem(
-                    text = device.name,
-                    onDelete = { viewModel.removeDeviceFromDb(device.id) },
-                    onItemClicked = {
-                        viewModel.setDevice(device)
-                        closeDrawer()
-                    }
-                )
-                HorizontalDivider()
-            }
-        }
-    }
-}
-
-@Composable
 fun AddNewDeviceContent(
     state: MapScreenState,
     viewModel: MapScreenViewModel,
@@ -500,6 +460,46 @@ fun AddNewDeviceContent(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(top = 16.dp)
             )
+        }
+    }
+}
+
+@Composable
+fun MyDevicesContent(
+    state: MapScreenState,
+    viewModel: MapScreenViewModel,
+    onBackToMenu: () -> Unit,
+    closeDrawer: () -> Unit,
+) {
+    NavigationDrawerItem(
+        label = { Text(text = "Back to Menu") },
+        icon = { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) },
+        selected = false,
+        onClick = { onBackToMenu() }
+    )
+    HorizontalDivider()
+
+    if ( state.devices.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "No Devices", style = MaterialTheme.typography.bodyLarge)
+        }
+    } else {
+        LazyColumn {
+            items(state.devices, key = { device -> device.id }) { device ->
+                SwipeableNavigationDrawerItem(
+                    text = device.name,
+                    onDelete = { viewModel.removeDeviceFromDb(device.id) },
+                    onItemClicked = {
+                        closeDrawer()
+                        viewModel.setDevice(device)
+                    }
+                )
+                HorizontalDivider()
+            }
         }
     }
 }
@@ -605,8 +605,7 @@ private fun MapScreenTopBar(
 @Composable
 private fun MapScreenContent(
     state: MapScreenState,
-    viewModel: MapScreenViewModel,
-    updateCameraCallback: () -> Unit
+    viewModel: MapScreenViewModel
 ) {
 
     val uiSettings = remember {
@@ -620,10 +619,7 @@ private fun MapScreenContent(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = state.cameraPositionState,
         uiSettings = uiSettings,
-        onMapLoaded = {
-            updateCameraCallback()
-        },
-        onMapClick = { latLng -> // TODO: otestovat
+        onMapClick = { latLng ->
             if (state.addingGeofence) {
                 viewModel.addGeofencePoint(latLng)
             }
@@ -637,14 +633,18 @@ private fun MapScreenContent(
                 Polyline(points = state.locationHistory.map { LatLng(it.latitude, it.longitude) })
             }
         }
-        if (state.deviceGeofenceVertices.isNotEmpty() && state.showGeofence) {
-            Polygon(
-                points = state.deviceGeofenceVertices.map { LatLng(it.latitude, it.longitude) },
-                fillColor = Color.Transparent,
-                strokeColor = Color.Red,
-                strokeJointType = JointType.BEVEL
-            )
-            // TODO: setError ak showGeofence true ale on neexistuje
+        if (state.showGeofence) {
+            if (state.deviceGeofenceVertices.isNotEmpty()) {
+                Polygon(
+                    points = state.deviceGeofenceVertices.map { LatLng(it.latitude, it.longitude) },
+                    fillColor = Color.Transparent,
+                    strokeColor = Color.Red,
+                    strokeJointType = JointType.BEVEL
+                )
+            } else {
+                viewModel.setError("This device does not have a geofence")
+                viewModel.setError(null) // TODO: mozno bude spamovat?
+            }
         }
         if (state.addedGeofenceVertices.isNotEmpty()) {
             if (state.addingGeofence) {

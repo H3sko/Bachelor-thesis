@@ -268,13 +268,13 @@ class MapScreenViewModel @Inject constructor(
                             }
                         }
                         is Resource.Error -> {
-                            when (result.code) {
-                                400 -> { setError("This device doesn't exist, please try again") }
-                                401 -> { setError("Try to re-login") }
-                                404 -> { setError("This device doesn't have a geofence") }
-                                -1 -> { setError("Internet connection error") }
-                                else -> { setError("An unexpected error occurred") }
-                            }
+//                            when (result.code) {
+//                                400 -> { setError("This device doesn't exist, please try again") }
+//                                401 -> { setError("Try to re-login") }
+//                                404 -> { setError("This device doesn't have a geofence") }
+//                                -1 -> { setError("Internet connection error") }
+//                                else -> { setError("An unexpected error occurred") }
+//                            }
                         }
                     }
                 }.launchIn(viewModelScope)
@@ -317,7 +317,7 @@ class MapScreenViewModel @Inject constructor(
         _state.value = _state.value.copy(addedGeofenceVertices = currentVertices)
 }
 
-    suspend fun updateCameraPosition() {
+     suspend fun updateCameraPosition() {
         if (state.value.locationLatest != null) {
             state.value.cameraPositionState.animate(
                 CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(LatLng(state.value.locationLatest!!.latitude, state.value.locationLatest!!.longitude), defaultZoom))
