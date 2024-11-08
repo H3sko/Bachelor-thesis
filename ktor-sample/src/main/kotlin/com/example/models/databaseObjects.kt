@@ -11,6 +11,13 @@ object Users : IntIdTable("users") {
     val salt = binary("salt", length = 255)
 }
 
+// TODO: OnlineUsers
+object OnlineUsers : IntIdTable("onlineUsers") {
+    val userId = reference("userId", Users, onDelete = ReferenceOption.CASCADE)
+    val token = varchar("token", length = 255)
+//    val timestamp = datetime("timestamp")
+}
+
 
 object Devices : IntIdTable("devices") {
     val userId = reference("userId", Users, onDelete = ReferenceOption.CASCADE)

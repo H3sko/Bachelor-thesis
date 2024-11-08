@@ -47,6 +47,7 @@ dependencies {
     implementation("org.quartz-scheduler:quartz:2.3.2")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
+    implementation("com.google.firebase:firebase-admin:9.4.1")
 
 
     implementation("org.jetbrains.exposed:exposed:0.17.14")

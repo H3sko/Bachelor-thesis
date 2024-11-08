@@ -9,6 +9,13 @@ data class ExposedUsers(
     val salt: ByteArray
 )
 
+// TODO: OnlineUsers
+@Serializable
+data class ExposedOnlineUser(
+    val userId: Int,
+    val token: String
+)
+
 @Serializable
 data class ExposedDevices(
     val userId: Int,
@@ -100,4 +107,11 @@ data class LocationWithId(
     val latitude: Double,
     val longitude: Double,
     val timestamp: String
+)
+
+data class GeofenceNotification(
+    val title: String,
+    val deviceId: Int,
+    val deviceName: String
+//    val breachLocation: String // e.g., "Lat: xx, Lng: xx"
 )

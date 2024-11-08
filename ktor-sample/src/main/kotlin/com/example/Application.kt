@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.firebase.FirebaseAdmin
 import com.example.jwt.JWTService
 import com.example.plugins.*
 import io.ktor.server.application.*
@@ -13,6 +14,7 @@ fun main() {
 }
 
 fun Application.module() {
+    FirebaseAdmin.init()
     configureHTTP()
     configureSerialization()
     configureDatabases()

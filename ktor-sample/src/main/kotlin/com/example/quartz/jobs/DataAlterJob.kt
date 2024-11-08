@@ -1,6 +1,8 @@
 package com.example.quartz.jobs
 import com.example.data.service.DeviceService
 import com.example.models.ExposedLocations
+import com.example.service.GeofenceService
+import com.example.service.GeofenceVerticesService
 import com.example.service.LocationsService
 import kotlinx.coroutines.runBlocking
 import org.quartz.Job
@@ -14,23 +16,25 @@ class DataAlterJob : Job {
     override fun execute(context: JobExecutionContext?) {
         val deviceService = DeviceService()
         val locationsService = LocationsService()
+        val geofenceService = GeofenceService()
+        val geofenceVerticesService = GeofenceVerticesService()
 
         // Fetch all device IDs
-        val deviceIds: List<Int> = runBlocking {
-            deviceService.getAllIds()
+        val devices: List<Pair<Int, String>> = runBlocking {
+            deviceService.getAllIdsAndSerialNames()
         }
 
-        for (deviceId in deviceIds) {
+        for (device in devices) {
             runBlocking {
                 // Fetch the latest location for each device
-                val latestLocation = locationsService.getLatest(deviceId)
+                val latestLocation = locationsService.getLatest(device.first )
 
                 val newLocation: ExposedLocations
 
                 if (latestLocation == null) {
                     // If no latest location exists, use the default location
                     newLocation = ExposedLocations(
-                        deviceId = deviceId,
+                        deviceId = device.first,
                         latitude = 49.210060,
                         longitude = 16.599250,
                         timestamp = getCurrentTimestamp()
@@ -40,15 +44,31 @@ class DataAlterJob : Job {
                     val (newLat, newLong) = getRandomLocation(latestLocation.latitude, latestLocation.longitude)
 
                     newLocation = ExposedLocations(
-                        deviceId = deviceId,
+                        deviceId = device.first,
                         latitude = newLat,
                         longitude = newLong,
                         timestamp = getCurrentTimestamp()
                     )
                 }
 
-                // Insert the new location into the database
                 locationsService.create(newLocation)
+
+
+                // Firebase notification
+//  TODO: zakomentovane kvoli testom
+//                val deviceGeofenceId: Int? = geofenceService.getGeofence(device.first)
+//
+//                if (deviceGeofenceId != null) {
+//                    val deviceGeofenceVertices: List<ExposedGeofenceVertices> = geofenceVerticesService.getAll(deviceGeofenceId)
+//
+//                    if (deviceGeofenceVertices.isNotEmpty()) {
+//                        val isInsideGeofence = isLocationInsidePolygon(newLocation, deviceGeofenceVertices)
+//                        // TODO: tuto treba ten token dorobit
+//                        if (!isInsideGeofence) {
+//                            sendGeofenceNotification("token", GeofenceNotification(title = "Warning", deviceId = device.first, deviceName = device.second))
+//                        }
+//                    }
+//                }
             }
         }
     }

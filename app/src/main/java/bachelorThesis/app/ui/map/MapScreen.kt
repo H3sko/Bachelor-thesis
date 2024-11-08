@@ -121,6 +121,7 @@ fun MapScreen(
             ModalDrawerContent(
                 navigator = navigator,
                 state = state,
+                localCoroutineScope = localCoroutineScope,
                 viewModel = viewModel,
                 modifier = Modifier,
                 closeDrawer = { localCoroutineScope.launch { drawerState.close() } },
@@ -250,6 +251,7 @@ fun ModalDrawerContent(
     navigator: DestinationsNavigator,
     state: MapScreenState,
     viewModel: MapScreenViewModel,
+    localCoroutineScope: CoroutineScope,
     modifier: Modifier,
     closeDrawer: () -> Unit,
     currentContent: DrawerContentType,
@@ -260,6 +262,7 @@ fun ModalDrawerContent(
             DrawerContentType.MAIN_MENU -> MainMenuContent(
                 navigator = navigator,
                 viewModel = viewModel,
+                localCoroutineScope = localCoroutineScope,
                 closeDrawer = closeDrawer,
                 onNavigateToAddDevice = { onContentChange(DrawerContentType.ADD_NEW_DEVICE) },
                 onNavigateToMyDevices = { onContentChange(DrawerContentType.MY_DEVICES) },
@@ -291,6 +294,7 @@ fun ModalDrawerContent(
 fun MainMenuContent(
     navigator: DestinationsNavigator,
     viewModel: MapScreenViewModel,
+    localCoroutineScope: CoroutineScope,
     closeDrawer: () -> Unit,
     onNavigateToAddDevice: () -> Unit,
     onNavigateToMyDevices: () -> Unit,
@@ -325,7 +329,7 @@ fun MainMenuContent(
         label = { Text(text = "Logout") },
         selected = false,
         onClick = {
-            viewModel.setLogout()
+            localCoroutineScope.launch { viewModel.setLogout() }
             navigator.navigate(HomeScreenDestination)
         }
     )

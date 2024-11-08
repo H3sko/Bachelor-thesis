@@ -13,6 +13,7 @@ import bachelorThesis.app.data.remote.dto.Device
 import bachelorThesis.app.data.remote.dto.DeviceCredentials
 import bachelorThesis.app.data.remote.dto.GeofenceVertex
 import bachelorThesis.app.data.remote.dto.LocationDto
+import bachelorThesis.app.domain.useCase.dataStore.ClearDataUseCase
 import bachelorThesis.app.domain.useCase.dataStore.GetJwtTokenUseCase
 import bachelorThesis.app.domain.useCase.devices.AddDeviceUseCase
 import bachelorThesis.app.domain.useCase.devices.GetDevicesUseCase
@@ -25,6 +26,7 @@ import bachelorThesis.app.domain.useCase.locations.GetLocationUseCase
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -44,6 +46,7 @@ class MapScreenViewModel @Inject constructor(
     private val getAllLocationsUseCase: GetAllLocationsUseCase,
     private val getLocationUseCase: GetLocationUseCase,
     private val getJwtTokenUseCase: GetJwtTokenUseCase,
+    private val clearDataUseCase: ClearDataUseCase
 ) : ViewModel() {
     private val _state: MutableState<MapScreenState> = mutableStateOf(MapScreenState())
     val state: State<MapScreenState> = _state
@@ -58,6 +61,18 @@ class MapScreenViewModel @Inject constructor(
         getJwtTokenUseCase()
             .onEach { result ->
                 if (result.isNotEmpty()) {
+                    FirebaseMessaging.getInstance().token
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val token = task.result
+                                Log.d("user je lognuty", token)
+                                // TODO
+//                              sendTokenToBackend(token)
+                            } else {
+                                Log.w("MainActivity", "Fetching FCM registration token failed", task.exception)
+                            }
+                        }
+
                     token = "Bearer $result"
                     getDevicesFromDb()
                     getPeriodicLocations() // TODO: toto mozno nebude fungovat a treba to spravit v LaunchedEffecte (chatGPT hovori ze idealne vo ViewModeli)
@@ -419,7 +434,8 @@ class MapScreenViewModel @Inject constructor(
         )
     }
 
-    fun setLogout() {
+    suspend fun setLogout() {
+        clearDataUseCase()
         _state.value = state.value.copy(
             error = null,
             message = null,

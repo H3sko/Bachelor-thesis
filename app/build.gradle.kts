@@ -7,6 +7,7 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
 
 
@@ -143,4 +144,9 @@ dependencies {
 
     //Swipe to refresh
     implementation("com.google.accompanist:accompanist-swiperefresh:0.34.0")
+
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-messaging-directboot:20.2.0")
 }

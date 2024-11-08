@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "872890135963",
+    "project_id": "airtag-tracker-423201",
+    "storage_bucket": "airtag-tracker-423201.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:872890135963:android:c041e5e096ea6f9555dd3e",
+        "android_client_info": {
+          "package_name": "bachelorThesis.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8D8Y_6ht6Z8jkd9A16P9EHchwxAo0BGg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

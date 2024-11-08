@@ -122,6 +122,14 @@ class DeviceService : IDeviceService {
         }
     }
 
+    override suspend fun getAllIdsAndSerialNames(): List<Pair<Int, String>> {
+        return dbQuery {
+            Devices.selectAll().map {
+                Pair(it[Devices.id].value, it[Devices.name])
+            }
+        }
+    }
+
 
 
     override suspend fun read(serialNumber: String): ExposedDevices? {

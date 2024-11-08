@@ -2,6 +2,10 @@ package com.example.utils.libs
 
 import com.example.models.ExposedGeofenceVertices
 import com.example.models.ExposedLocations
+import com.example.models.GeofenceNotification
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.Message
+import com.google.firebase.messaging.Notification
 import java.lang.Math.toRadians
 import kotlin.math.PI
 import kotlin.math.ln
@@ -118,4 +122,19 @@ fun mercator(latRad: Double): Double {
 
 private fun tanLatGC(lat1: Double, lat2: Double, lng2: Double, lng3: Double): Double {
     return (tan(lat1) * sin(lng2 - lng3) + tan(lat2) * sin(lng3)) / sin(lng2)
+}
+
+fun sendGeofenceNotification(token: String, geofenceNotification: GeofenceNotification) {
+    val message = Message.builder()
+        .setToken(token)
+        .setNotification(
+            Notification.builder()
+                .setTitle(geofenceNotification.title)
+                .setBody("${geofenceNotification.deviceName} has left its geofence")
+                .build()
+        )
+        .putData("deviceId", geofenceNotification.deviceId.toString())
+        .build()
+
+    FirebaseMessaging.getInstance().send(message)
 }
