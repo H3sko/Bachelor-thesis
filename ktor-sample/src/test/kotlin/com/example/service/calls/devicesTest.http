@@ -1,0 +1,40 @@
+POST http://127.0.0.1:8080/device/add
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODQ5NjI2NX0.cYFAhTpHxBfNPlHvKawMLfPWYrJSyOIu9HLDv8s8fuA
+
+{
+  "name": "Michal’s Airpods",
+  "owner": "owner@localhost"
+}
+
+###
+DELETE http://127.0.0.1:8080/device/remove/13
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODE0MzAwNX0.34Y76bWkxKs3QcSReTi-TsIWKMcSE9JP6fLtz7EeM_0
+
+###
+GET http://127.0.0.1:8080/device/getUserDevices
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODEzOTMwNn0.1sVC2K55t3VRZVHFKVE89XjkQeMjbI4R7s7o-Z0Py5I
+
+### ADMIN requests
+###
+GET http://127.0.0.1:8080/device/11
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MjgxMzkyMDJ9.lJYyNmGBzNzHGq9dLwaF1ATP8DLWU4YHIdcAzTHeqzs
+###
+DELETE http://127.0.0.1:8080/device/remove/14
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MjgxMzkyMDJ9.lJYyNmGBzNzHGq9dLwaF1ATP8DLWU4YHIdcAzTHeqzs
+###
+GET http://127.0.0.1:8080/device/getAll
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MjgxMzkyMDJ9.lJYyNmGBzNzHGq9dLwaF1ATP8DLWU4YHIdcAzTHeqzs
+###
+DELETE http://127.0.0.1:8080/device/deleteAll
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MjgxMzkyMDJ9.lJYyNmGBzNzHGq9dLwaF1ATP8DLWU4YHIdcAzTHeqzs
+###
+DELETE http://127.0.0.1:8080/device/deleteAll/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MjgxMzkyMDJ9.lJYyNmGBzNzHGq9dLwaF1ATP8DLWU4YHIdcAzTHeqzs
