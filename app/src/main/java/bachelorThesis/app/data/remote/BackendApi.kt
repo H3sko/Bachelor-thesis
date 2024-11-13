@@ -2,8 +2,10 @@ package bachelorThesis.app.data.remote
 
 import bachelorThesis.app.data.remote.dto.DeviceDto
 import bachelorThesis.app.data.remote.dto.DeviceJson
+import bachelorThesis.app.data.remote.dto.FcmTokenJson
 import bachelorThesis.app.data.remote.dto.GeofenceVertex
 import bachelorThesis.app.data.remote.dto.LocationDto
+import bachelorThesis.app.data.remote.dto.NotificationSwitchJson
 import bachelorThesis.app.data.remote.dto.Response
 import bachelorThesis.app.data.remote.dto.TokenJson
 import bachelorThesis.app.data.remote.dto.UserJson
@@ -13,6 +15,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -52,4 +55,18 @@ interface BackendApi {
 
     @DELETE("geofence/delete/device/{deviceId}")
     suspend fun removeGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): Response
+
+    // TODO: mozno pridat     @Headers("Content-Type: application/json")
+    @POST("onlineUser/add")
+    suspend fun addFcmToken(@Header("Authorization") credentials: String, @Body payload: FcmTokenJson): Response
+
+    @DELETE("onlineUser/remove")
+    suspend fun removeFcmToken(@Header("Authorization") credentials: String): Response
+
+    @PUT("onlineUser/notification/switch")
+    suspend fun putNotificationStatus(@Header("Authorization") credentials: String, @Body payload: NotificationSwitchJson): Boolean
+
+    @GET("onlineUser/notification/status")
+    suspend fun getNotificationStatus(@Header("Authorization") credentials: String): Boolean
+
 }

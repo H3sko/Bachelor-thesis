@@ -10,7 +10,7 @@ interface IDeviceService {
    suspend fun deleteAllDevices(userId: Int): Boolean
    suspend fun deleteDevice(id: Int): Boolean
    suspend fun getAll(userId: Int): List<ExposedDeviceResponse>
-   suspend fun getAllDevices(): List<List<String>>
+   suspend fun getAllDevices(): List<ExposedDeviceResponse>
    suspend fun getAllIds(): List<Int>
    suspend fun getAllIdsAndSerialNumbers(): List<Pair<Int, String>>
    suspend fun getAllIdsAndSerialNames(): List<Pair<Int, String>>

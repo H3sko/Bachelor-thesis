@@ -22,4 +22,6 @@ data class MapScreenState(
     // Creating geofence
     var addedGeofenceVertices: List<GeofenceVertex> = emptyList(),
     var addingGeofence: Boolean = false,
+    // Geofence notifications
+    var geofenceNotificationStatus: Boolean = false
 )

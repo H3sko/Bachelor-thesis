@@ -77,13 +77,13 @@ class DeviceService : IDeviceService {
         }
     }
 
-    override suspend fun getAllDevices(): List<List<String>> {
+    override suspend fun getAllDevices(): List<ExposedDeviceResponse> {
         return dbQuery {
             Devices.selectAll()
                 .map {
-                    listOf(
-                        it[Devices.id].toString(),
-                        it[Devices.userId].toString(),
+                    ExposedDeviceResponse(
+                        it[Devices.id].value,
+                        it[Devices.userId].value,
                         it[Devices.name],
                         it[Devices.serialNumber]
                     )

@@ -18,6 +18,10 @@ import bachelorThesis.app.domain.useCase.dataStore.GetJwtTokenUseCase
 import bachelorThesis.app.domain.useCase.devices.AddDeviceUseCase
 import bachelorThesis.app.domain.useCase.devices.GetDevicesUseCase
 import bachelorThesis.app.domain.useCase.devices.RemoveDeviceUseCase
+import bachelorThesis.app.domain.useCase.firebase.AddFcmTokenUseCase
+import bachelorThesis.app.domain.useCase.firebase.GetNotificationStatusUseCase
+import bachelorThesis.app.domain.useCase.firebase.PutNotificationStatusUseCase
+import bachelorThesis.app.domain.useCase.firebase.RemoveFcmTokenUseCase
 import bachelorThesis.app.domain.useCase.geofences.AddGeofenceUseCase
 import bachelorThesis.app.domain.useCase.geofences.GetGeofenceUseCase
 import bachelorThesis.app.domain.useCase.geofences.RemoveGeofenceUseCase
@@ -46,8 +50,12 @@ class MapScreenViewModel @Inject constructor(
     private val getAllLocationsUseCase: GetAllLocationsUseCase,
     private val getLocationUseCase: GetLocationUseCase,
     private val getJwtTokenUseCase: GetJwtTokenUseCase,
-    private val clearDataUseCase: ClearDataUseCase
-) : ViewModel() {
+    private val clearDataUseCase: ClearDataUseCase,
+    private val addFcmTokenUseCase: AddFcmTokenUseCase,
+    private val removeFcmTokenUseCase: RemoveFcmTokenUseCase,
+    private val putNotificationStatusUseCase: PutNotificationStatusUseCase,
+    private val getNotificationStatusUseCase: GetNotificationStatusUseCase,
+    ) : ViewModel() {
     private val _state: MutableState<MapScreenState> = mutableStateOf(MapScreenState())
     val state: State<MapScreenState> = _state
 
@@ -64,15 +72,24 @@ class MapScreenViewModel @Inject constructor(
                     FirebaseMessaging.getInstance().token
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                val token = task.result
-                                Log.d("user je lognuty", token)
-                                // TODO
-//                              sendTokenToBackend(token)
+                                val authToken = "Bearer $result"
+                                val fcmToken = task.result
+                                addFcmTokenUseCase(credentials = authToken, token = fcmToken, activeNotification = false)
+                                    .onEach { result ->
+                                        when (result) {
+                                            is Resource.Loading -> {}
+                                            is Resource.Success -> {
+                                                setGeofenceNotificationStatus(false)
+                                            }
+                                            is Resource.Error -> {
+                                                setError(result.data)
+                                            }
+                                        }
+                                    }.launchIn(viewModelScope)
                             } else {
                                 Log.w("MainActivity", "Fetching FCM registration token failed", task.exception)
                             }
                         }
-
                     token = "Bearer $result"
                     getDevicesFromDb()
                     getPeriodicLocations() // TODO: toto mozno nebude fungovat a treba to spravit v LaunchedEffecte (chatGPT hovori ze idealne vo ViewModeli)
@@ -199,6 +216,53 @@ class MapScreenViewModel @Inject constructor(
                     is Resource.Error -> {
                         when(result2.code) {
                             400 -> { setError("Something went wrong, please restart the ap") }
+                            -1 -> { setError("Internet connection error") }
+                            else -> { setError("An unexpected error occurred") }
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
+    }
+
+    private fun getGeofenceNotificationStatusFromDb() {
+        getNotificationStatusUseCase(credentials = token)
+            .onEach { result3 ->
+                when (result3) {
+                    is Resource.Loading -> {}
+                    is Resource.Success -> {
+                        if (result3.data != null) {
+                            setGeofenceNotificationStatus(result3.data)
+                        } else {
+                            setError("Something went wrong, please restart the app to load the devices properly")
+                        }
+                    }
+                    is Resource.Error -> {
+                        when(result3.code) {
+                            409 -> { setError("User is offline") }
+                            -1 -> { setError("Internet connection error") }
+                            else -> { setError("An unexpected error occurred") }
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
+    }
+
+    fun toggleGeofenceNotification() {
+        val geofenceNotificationStatus = _state.value.geofenceNotificationStatus
+        putNotificationStatusUseCase(credentials = token, geofenceNotificationStatus.not())
+            .onEach { result ->
+                when (result) {
+                    is Resource.Loading -> {}
+                    is Resource.Success -> {
+                        if (result.data != null) {
+                            setGeofenceNotificationStatus(result.data)
+                        } else {
+                            setError("Something went wrong, please restart the app to load the devices properly")
+                        }
+                    }
+                    is Resource.Error -> {
+                        when(result.code) {
+                            409 -> { setError("User is offline") }
                             -1 -> { setError("Internet connection error") }
                             else -> { setError("An unexpected error occurred") }
                         }
@@ -410,6 +474,12 @@ class MapScreenViewModel @Inject constructor(
         )
     }
 
+    private fun setGeofenceNotificationStatus(newValue: Boolean) {
+        _state.value = state.value.copy(
+            geofenceNotificationStatus = newValue
+        )
+    }
+
     fun setShowLocationHistory(newValue: Boolean) {
         _state.value = state.value.copy(
             showLocationHistory = newValue
@@ -435,18 +505,34 @@ class MapScreenViewModel @Inject constructor(
     }
 
     suspend fun setLogout() {
-        clearDataUseCase()
-        _state.value = state.value.copy(
-            error = null,
-            message = null,
-            token = "",
-            devices = emptyList(),
-            device = null,
-            deviceGeofenceVertices = emptyList(),
-            locationLatest = null,
-            locationHistory = emptyList(),
-            showLocationHistory = false,
-            showGeofence = false
-        )
+        removeFcmTokenUseCase(credentials = token)
+            .onEach { result ->
+                when (result) {
+                    is Resource.Loading -> {}
+                    is Resource.Success -> {
+                        clearDataUseCase()
+                        _state.value = state.value.copy(
+                            error = null,
+                            message = null,
+                            token = "",
+                            devices = emptyList(),
+                            device = null,
+                            deviceGeofenceVertices = emptyList(),
+                            locationLatest = null,
+                            locationHistory = emptyList(),
+                            showLocationHistory = false,
+                            showGeofence = false
+                        )
+                    }
+                    is Resource.Error -> {
+                        when (result.code) {
+                            401 -> { setError("Try to re-login") }
+                            404 -> { setError("This device doesn't exist, try to re-login") }
+                            -1 -> { setError("Internet connection error") }
+                            else -> { setError("An unexpected error occurred") }
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope) // TODO: zistit ci toto tu mat byt
     }
 }

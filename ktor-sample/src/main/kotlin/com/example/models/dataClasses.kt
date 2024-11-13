@@ -9,11 +9,11 @@ data class ExposedUsers(
     val salt: ByteArray
 )
 
-// TODO: OnlineUsers
 @Serializable
 data class ExposedOnlineUser(
     val userId: Int,
-    val token: String
+    val token: String,
+    val activeNotification: Boolean
 )
 
 @Serializable
@@ -71,6 +71,17 @@ data class UserRequest(
 )
 
 @Serializable
+data class OnlineUserRequest(
+    val token: String,
+    val activeNotification: Boolean
+)
+
+@Serializable
+data class SwitchRequest(
+    val activeNotification: Boolean
+)
+
+@Serializable
 data class DeviceCredentials(
     val name: String,
     val owner: String
@@ -85,12 +96,6 @@ data class GeofenceVertexRequest(
 data class GeofenceVertex(
     val latitude: Double,
     val longitude: Double
-)
-
-@Serializable
-data class GeofenceResponse(
-    val geofenceId: Int,
-    val vertices: List<GeofenceVertex>
 )
 
 @Serializable

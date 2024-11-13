@@ -1,57 +1,86 @@
 package bachelorThesis.app.service
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import bachelorThesis.app.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class PushNotificationService: FirebaseMessagingService() {
 
-    // TODO
+    companion object {
+        private const val CHANNEL_ID = "default_channel_id"
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+    }
+
     override fun onNewToken(token: String) {
         Log.d("token", "Refreshed token: $token")
 
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // FCM registration token to your app server.
-//        sendRegistrationToServer(token)
         super.onNewToken(token)
     }
 
     // TODO
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // TODO(developer): Handle FCM messages here.
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.d("From:", "From: ${remoteMessage.from}")
 
-        // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
-            Log.d("Message data payload:", "Message data payload: ${remoteMessage.data}")
-
-            // Check if data needs to be processed by long running job
-//            if (needsToBeScheduled()) {
-//                // For long-running tasks (10 seconds or more) use WorkManager.
-//                scheduleJob()
-//            } else {
-//                // Handle message within 10 seconds
-//                handleNow()
-//            }
+            Log.d("TAG", "Message data payload: ${remoteMessage.data}")
         }
 
-        // Check if message contains a notification payload.
         remoteMessage.notification?.let {
-            Log.d("Message Notification Body: ", "Message Notification Body: ${it.body}")
+            Log.d("TAG", "Message Notification Body: ${it.body}")
+            sendNotification(it.title ?: "Notification", it.body ?: "Message received")
         }
-
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
     }
+
+    private fun sendNotification(title: String, message: String) {
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.mipmap.ic_stat_ic_notification)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+        with(NotificationManagerCompat.from(this)) {
+            if (ActivityCompat.checkSelfPermission(
+                    applicationContext,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+            notify(1, builder.build())
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Default Channel"
+            val descriptionText = "Channel for Firebase notifications"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
 
     // TODO
     override fun onDeletedMessages() {
         super.onDeletedMessages()
-    }
-
-    private fun sendRegistrationToServer(token: String) {
-
     }
 }

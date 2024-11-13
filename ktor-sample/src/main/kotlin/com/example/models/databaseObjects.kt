@@ -15,6 +15,7 @@ object Users : IntIdTable("users") {
 object OnlineUsers : IntIdTable("onlineUsers") {
     val userId = reference("userId", Users, onDelete = ReferenceOption.CASCADE)
     val token = varchar("token", length = 255)
+    val activeNotification = bool("activeNotification")
 //    val timestamp = datetime("timestamp")
 }
 

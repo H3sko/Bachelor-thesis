@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerState
@@ -42,6 +43,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -266,7 +268,8 @@ fun ModalDrawerContent(
                 closeDrawer = closeDrawer,
                 onNavigateToAddDevice = { onContentChange(DrawerContentType.ADD_NEW_DEVICE) },
                 onNavigateToMyDevices = { onContentChange(DrawerContentType.MY_DEVICES) },
-                onNavigateToGeofence = { onContentChange(DrawerContentType.GEOFENCE) }
+                onNavigateToGeofence = { onContentChange(DrawerContentType.GEOFENCE) },
+                onNavigateToNotifications = { onContentChange(DrawerContentType.NOTIFICATIONS) }
             )
             DrawerContentType.MY_DEVICES -> MyDevicesContent(
                 state = state,
@@ -285,6 +288,11 @@ fun ModalDrawerContent(
                 onBackToMenu = { onContentChange(DrawerContentType.MAIN_MENU) },
                 closeDrawer = closeDrawer
             )
+            DrawerContentType.NOTIFICATIONS -> NotificationsContent(
+                state = state,
+                viewModel = viewModel,
+                onBackToMenu = { onContentChange(DrawerContentType.MAIN_MENU) }
+            )
         }
     }
 }
@@ -298,7 +306,8 @@ fun MainMenuContent(
     closeDrawer: () -> Unit,
     onNavigateToAddDevice: () -> Unit,
     onNavigateToMyDevices: () -> Unit,
-    onNavigateToGeofence: () -> Unit
+    onNavigateToGeofence: () -> Unit,
+    onNavigateToNotifications: () -> Unit
 ) {
     NavigationDrawerItem(
         onClick = { closeDrawer() },
@@ -323,6 +332,12 @@ fun MainMenuContent(
         label = { Text(text = "Geofence") },
         selected = false,
         onClick = { onNavigateToGeofence() }
+    )
+    HorizontalDivider()
+    NavigationDrawerItem(
+        label = { Text(text = "Notifications") },
+        selected = false,
+        onClick = { onNavigateToNotifications() }
     )
     HorizontalDivider()
     NavigationDrawerItem(
@@ -570,6 +585,70 @@ fun GeofenceContent(
     }
 }
 
+@Composable
+fun NotificationsContent(
+    state: MapScreenState,
+    viewModel: MapScreenViewModel,
+    onBackToMenu: () -> Unit
+) {
+    val isNotificationsEnabled = state.geofenceNotificationStatus
+    val coroutineScope = rememberCoroutineScope()
+
+    NavigationDrawerItem(
+        label = { Text(text = "Back to Menu") },
+        icon = { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) },
+        selected = false,
+        onClick = { onBackToMenu() }
+    )
+    HorizontalDivider()
+
+    Column {
+        DrawerItemWithSwitch(
+            label = "Enable Geofence Alerts",
+            description = "Get notified when your device enters or leaves a designated area.",
+            isChecked = isNotificationsEnabled,
+            onCheckedChange = { viewModel.toggleGeofenceNotification() }
+        )
+    }
+}
+
+@Composable
+fun DrawerItemWithSwitch(
+    label: String,
+    description: String,
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    val isExpanded = remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = label, style = MaterialTheme.typography.labelSmall)
+            Spacer(modifier = Modifier.weight(1f))
+
+            Switch(
+                checked = isChecked,
+                onCheckedChange = onCheckedChange
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray)
+        )
+
+        IconButton(onClick = { isExpanded.value = !isExpanded.value }) {
+            Icon(Icons.Default.Info, contentDescription = "Info")
+        }
+
+        if (isExpanded.value) {
+            Text(text = "A geofence is a virtual boundary. When your device enters or leaves this area, you will receive an alert.")
+        }
+    }
+}
 
 
 @Composable

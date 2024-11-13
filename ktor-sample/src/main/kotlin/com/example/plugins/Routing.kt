@@ -25,18 +25,21 @@ fun Application.configureRouting(jwtService: JWTService) {
         }
         usersDefault(jwtService)
         authenticate("auth-user") {
+            onlineUsersDefault(jwtService)
             devicesDefault(jwtService)
             locationsDefault(jwtService)
             geofencesDefault(jwtService)
             geofenceVerticesDefault(jwtService)
         }
         authenticate("auth-admin") {
+            onlineUsersDefault(jwtService)
             devicesDefault(jwtService)
             locationsDefault(jwtService)
             geofencesDefault(jwtService)
             geofenceVerticesDefault(jwtService)
 
             usersAdmin()
+            onlineUsersAdmin()
             devicesAdmin()
             locationsAdmin()
             geofencesAdmin()

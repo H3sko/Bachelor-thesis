@@ -1,13 +1,14 @@
 package bachelorThesis.app.data.repository
 
-import android.util.Log
 import bachelorThesis.app.common.Resource
 import bachelorThesis.app.data.remote.BackendApi
 import bachelorThesis.app.data.remote.dto.Device
 import bachelorThesis.app.data.remote.dto.DeviceCredentials
 import bachelorThesis.app.data.remote.dto.DeviceJson
+import bachelorThesis.app.data.remote.dto.FcmTokenJson
 import bachelorThesis.app.data.remote.dto.GeofenceVertex
 import bachelorThesis.app.data.remote.dto.LocationDto
+import bachelorThesis.app.data.remote.dto.NotificationSwitchJson
 import bachelorThesis.app.data.remote.dto.TokenJson
 import bachelorThesis.app.data.remote.dto.UserJson
 import bachelorThesis.app.data.remote.dto.UserRequest
@@ -165,9 +166,7 @@ class RepositoryImpl @Inject constructor(
         return flow {
             try {
                 emit(Resource.Loading<String>())
-                Log.d("val deleted = api.removeGeofence(credentials, deviceId)", "pred")
                 val deleted = api.removeGeofence(credentials, deviceId)
-                Log.d("val deleted = api.removeGeofence(credentials, deviceId)", "po")
                 emit(Resource.Success<String>(deleted.message))
             } catch (e: HttpException) {
                 emit(Resource.Error<String>(e.code()))
@@ -178,4 +177,66 @@ class RepositoryImpl @Inject constructor(
         }
     }
 
+    // TODO: malo by byt done, treba otestovat
+
+    override fun addFcmToken(credentials: String, token: String, activeNotification: Boolean): Flow<Resource<String>> {
+        return flow {
+            try {
+                emit(Resource.Loading<String>())
+                val added = api.addFcmToken(credentials, FcmTokenJson(token, activeNotification))
+                emit(Resource.Success<String>(added.message))
+            } catch (e: HttpException) {
+                emit(Resource.Error<String>(e.code()))
+            }
+            catch (e: IOException) {
+                emit(Resource.Error<String>(-1))
+            }
+        }
+    }
+
+    override fun removeFcmToken(credentials: String): Flow<Resource<String>> {
+        return flow {
+            try {
+                emit(Resource.Loading<String>())
+                val deleted = api.removeFcmToken(credentials)
+                emit(Resource.Success<String>(deleted.message))
+            } catch (e: HttpException) {
+                emit(Resource.Error<String>(e.code()))
+            }
+            catch (e: IOException) {
+                emit(Resource.Error<String>(-1))
+            }
+        }
+    }
+
+    override fun putNotificationStatus(credentials: String, newValue: Boolean): Flow<Resource<Boolean>> {
+        return flow {
+            try {
+                emit(Resource.Loading<Boolean>())
+                val updated = api.putNotificationStatus(credentials, NotificationSwitchJson(newValue))
+                emit(Resource.Success<Boolean>(updated))
+            } catch (e: HttpException) {
+                emit(Resource.Error<Boolean>(e.code()))
+            }
+            catch (e: IOException) {
+                emit(Resource.Error<Boolean>(-1))
+            }
+        }
+    }
+
+    // TODO: mozno ten return type nebude Boolean ale nejaky Jsonbody a bude treba upravit return type
+    override fun getNotificationStatus(credentials: String): Flow<Resource<Boolean>> {
+        return flow {
+            try {
+                emit(Resource.Loading<Boolean>())
+                val notificationStatus = api.getNotificationStatus(credentials)
+                emit(Resource.Success<Boolean>(notificationStatus))
+            } catch (e: HttpException) {
+                emit(Resource.Error<Boolean>(e.code()))
+            }
+            catch (e: IOException) {
+                emit(Resource.Error<Boolean>(-1))
+            }
+        }
+    }
 }

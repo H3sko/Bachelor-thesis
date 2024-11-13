@@ -88,5 +88,16 @@ data class TokenJson(
 )
 
 @Keep
+data class FcmTokenJson(
+    @SerializedName("token") val token: String?,
+    @SerializedName("activeNotification") val activeNotification: Boolean?
+)
+
+@Keep
+data class NotificationSwitchJson(
+    @SerializedName("activeNotification") val activeNotification: Boolean?
+)
+
+@Keep
 data class Response(val message: String)
 

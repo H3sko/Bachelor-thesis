@@ -29,4 +29,12 @@ interface Repository {
     fun addGeofence(credentials: String, deviceId: String, vertices: List<GeofenceVertex>): Flow<Resource<String>>
 
     fun removeGeofence(credentials: String, deviceId: String): Flow<Resource<String>>
+
+    fun addFcmToken(credentials: String, token: String, activeNotification: Boolean): Flow<Resource<String>>
+
+    fun removeFcmToken(credentials: String): Flow<Resource<String>>
+
+    fun putNotificationStatus(credentials: String, newValue: Boolean): Flow<Resource<Boolean>>
+
+    fun getNotificationStatus(credentials: String): Flow<Resource<Boolean>>
 }

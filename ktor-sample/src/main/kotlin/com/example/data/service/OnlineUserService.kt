@@ -1,14 +1,12 @@
 package com.example.data.service
 
+import com.example.models.ExposedOnlineUser
 import com.example.models.OnlineUsers
 import com.example.service.IOnlineUsers
 import com.example.service.dbQuery
-import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 
 
 class OnlineUserService : IOnlineUsers {
@@ -18,17 +16,35 @@ class OnlineUserService : IOnlineUsers {
         }
     }
 
-    override suspend fun getAllOnlineUsers(): List<Pair<Int, String>> {
+    override suspend fun create(exposedOnlineUser: ExposedOnlineUser): Int = dbQuery {
+        OnlineUsers.insertAndGetId {
+            it[userId] = exposedOnlineUser.userId
+            it[token] = exposedOnlineUser.token
+            it[activeNotification] = exposedOnlineUser.activeNotification
+        }.value
+    }
+
+    override suspend fun deleteAllOnlineUsers() {
+        dbQuery {
+            OnlineUsers.deleteAll()
+        }
+    }
+
+    override suspend fun getAllOnlineUsers(): List<List<String>> {
         return dbQuery {
             OnlineUsers.selectAll().map{
-                Pair(it[OnlineUsers.userId].value, it[OnlineUsers.token])
+                listOf(
+                    it[OnlineUsers.userId].toString(),
+                    it[OnlineUsers.token],
+                    it[OnlineUsers.activeNotification].toString()
+                )
             }
         }
     }
 
-    override suspend fun getTokenByUserId(userId: Int): String? {
+    override suspend fun getOnlineUserByUserId(userId: Int): Pair<String, Boolean>? {
         return dbQuery { OnlineUsers.selectAll().where { OnlineUsers.userId eq userId }
-            .mapNotNull { it[OnlineUsers.token] }
+            .map { Pair(it[OnlineUsers.token], it[OnlineUsers.activeNotification]) }
             .singleOrNull()
         }
     }
@@ -44,6 +60,21 @@ class OnlineUserService : IOnlineUsers {
         return dbQuery {
             val updatedTokens = OnlineUsers.update({ OnlineUsers.userId eq userId }) { it[token] = newToken }
             updatedTokens > 0
+        }
+    }
+
+    override suspend fun switchNotification(userId: Int, newState: Boolean): Boolean {
+        return dbQuery {
+            val updatedTokens = OnlineUsers.update({ OnlineUsers.userId eq userId }) { it[activeNotification] = newState }
+            updatedTokens > 0
+        }
+    }
+
+    override suspend fun getNotificationStatus(userId: Int): Boolean? {
+        return dbQuery {
+            OnlineUsers.selectAll().where { OnlineUsers.userId eq userId }
+                .map { it[OnlineUsers.activeNotification] }
+                .singleOrNull()
         }
     }
 

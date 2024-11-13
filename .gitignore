@@ -13,3 +13,4 @@
 .externalNativeBuild
 .cxx
 local.properties
+ktor-sample/src/main/resources/serviceAccountKey.json

@@ -3,6 +3,7 @@ package com.example.utils.libs
 import com.example.models.ExposedGeofenceVertices
 import com.example.models.ExposedLocations
 import com.example.models.GeofenceNotification
+import com.google.firebase.messaging.AndroidConfig
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import com.google.firebase.messaging.Notification
@@ -133,7 +134,11 @@ fun sendGeofenceNotification(token: String, geofenceNotification: GeofenceNotifi
                 .setBody("${geofenceNotification.deviceName} has left its geofence")
                 .build()
         )
-        .putData("deviceId", geofenceNotification.deviceId.toString())
+        .setAndroidConfig(
+            AndroidConfig.builder()
+                .setPriority(AndroidConfig.Priority.HIGH)
+                .build()
+        )
         .build()
 
     FirebaseMessaging.getInstance().send(message)
