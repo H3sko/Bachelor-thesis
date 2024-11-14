@@ -26,7 +26,7 @@ fun Route.usersDefault(jwtService: JWTService) {
 
                     token?.let {
                         call.respond(HttpStatusCode.OK, hashMapOf("token" to token))
-                    } ?: call.respond(HttpStatusCode.Unauthorized)
+                    } ?: call.respond(HttpStatusCode.Unauthorized, "Invalid token")
                 } else {
                     call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
                 }

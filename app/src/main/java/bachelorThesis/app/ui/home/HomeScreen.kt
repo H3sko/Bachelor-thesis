@@ -124,7 +124,6 @@ fun DestinationButtons(
             HomeScreenButton(
                 value = "Login",
                 destination = LoginScreenDestination,
-//                destination = MapScreenDestination, // TODO: ked chcem testovat mapu bez loginu
                 navigator = navigator,
                 modifier = Modifier
                     .fillMaxWidth(fraction = 0.5f)

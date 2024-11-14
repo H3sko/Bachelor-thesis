@@ -1,19 +1,18 @@
 package bachelorThesis.app.data.repository
 
 import bachelorThesis.app.common.Resource
+import bachelorThesis.app.data.model.dto.Device
+import bachelorThesis.app.data.model.dto.LocationDto
+import bachelorThesis.app.data.model.dto.TokenDto
+import bachelorThesis.app.data.model.dto.toDevice
+import bachelorThesis.app.data.model.json.DeviceCredentialsJson
+import bachelorThesis.app.data.model.json.DeviceJson
+import bachelorThesis.app.data.model.json.FcmTokenJson
+import bachelorThesis.app.data.model.json.NotificationSwitchJson
+import bachelorThesis.app.data.model.json.UserJson
 import bachelorThesis.app.data.remote.BackendApi
-import bachelorThesis.app.data.remote.dto.Device
-import bachelorThesis.app.data.remote.dto.DeviceCredentials
-import bachelorThesis.app.data.remote.dto.DeviceJson
-import bachelorThesis.app.data.remote.dto.FcmTokenJson
-import bachelorThesis.app.data.remote.dto.GeofenceVertex
-import bachelorThesis.app.data.remote.dto.LocationDto
-import bachelorThesis.app.data.remote.dto.NotificationSwitchJson
-import bachelorThesis.app.data.remote.dto.TokenJson
-import bachelorThesis.app.data.remote.dto.UserJson
-import bachelorThesis.app.data.remote.dto.UserRequest
-import bachelorThesis.app.data.remote.dto.toDevice
 import bachelorThesis.app.domain.repository.Repository
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -23,7 +22,7 @@ import javax.inject.Inject
 class RepositoryImpl @Inject constructor(
     private val api: BackendApi
 ) : Repository {
-    override fun register(payload: UserRequest): Flow<Resource<Int>> {
+    override fun register(payload: UserJson): Flow<Resource<Int>> {
         return flow {
             try {
                 emit(Resource.Loading<Int>())
@@ -38,17 +37,17 @@ class RepositoryImpl @Inject constructor(
         }
     }
 
-    override fun login(payload: UserRequest): Flow<Resource<TokenJson>> {
+    override fun login(payload: UserJson): Flow<Resource<TokenDto>> {
         return flow {
             try {
-                emit(Resource.Loading<TokenJson>())
+                emit(Resource.Loading<TokenDto>())
                 val token = api.login(UserJson(username = payload.username, password = payload.password))
-                emit(Resource.Success<TokenJson>(token))
+                emit(Resource.Success<TokenDto>(token))
             } catch (e: HttpException) {
-                emit(Resource.Error<TokenJson>(e.code()))
+                emit(Resource.Error<TokenDto>(e.code()))
             }
             catch (e: IOException) {
-                emit(Resource.Error<TokenJson>(-1))
+                emit(Resource.Error<TokenDto>(-1))
             }
         }
     }
@@ -68,7 +67,7 @@ class RepositoryImpl @Inject constructor(
         }
     }
 
-    override fun addDevice(credentials: String, payload: DeviceCredentials): Flow<Resource<Int>> {
+    override fun addDevice(credentials: String, payload: DeviceCredentialsJson): Flow<Resource<Int>> {
         return flow {
             try {
                 emit(Resource.Loading<Int>())
@@ -132,22 +131,22 @@ class RepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getGeofence(credentials: String, deviceId: String): Flow<Resource<List<GeofenceVertex>>> {
+    override fun getGeofence(credentials: String, deviceId: String): Flow<Resource<List<LatLng>>> {
         return flow {
             try {
-                emit(Resource.Loading<List<GeofenceVertex>>())
+                emit(Resource.Loading<List<LatLng>>())
                 val vertices = api.getGeofence(credentials, deviceId)
-                emit(Resource.Success<List<GeofenceVertex>>(vertices))
+                emit(Resource.Success<List<LatLng>>(vertices))
             } catch (e: HttpException) {
-                emit(Resource.Error<List<GeofenceVertex>>(e.code()))
+                emit(Resource.Error<List<LatLng>>(e.code()))
             }
             catch (e: IOException) {
-                emit(Resource.Error<List<GeofenceVertex>>(-1))
+                emit(Resource.Error<List<LatLng>>(-1))
             }
         }
     }
 
-    override fun addGeofence(credentials: String, deviceId: String, vertices: List<GeofenceVertex>): Flow<Resource<String>> {
+    override fun addGeofence(credentials: String, deviceId: String, vertices: List<LatLng>): Flow<Resource<String>> {
         return flow {
             try {
                 emit(Resource.Loading<String>())
@@ -176,8 +175,6 @@ class RepositoryImpl @Inject constructor(
             }
         }
     }
-
-    // TODO: malo by byt done, treba otestovat
 
     override fun addFcmToken(credentials: String, token: String, activeNotification: Boolean): Flow<Resource<String>> {
         return flow {
@@ -224,7 +221,6 @@ class RepositoryImpl @Inject constructor(
         }
     }
 
-    // TODO: mozno ten return type nebude Boolean ale nejaky Jsonbody a bude treba upravit return type
     override fun getNotificationStatus(credentials: String): Flow<Resource<Boolean>> {
         return flow {
             try {

@@ -1,7 +1,7 @@
 package bachelorThesis.app.domain.useCase.devices
 
 import bachelorThesis.app.common.Resource
-import bachelorThesis.app.data.remote.dto.Device
+import bachelorThesis.app.data.model.dto.Device
 import bachelorThesis.app.domain.repository.Repository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

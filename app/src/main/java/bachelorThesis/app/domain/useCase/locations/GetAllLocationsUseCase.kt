@@ -1,7 +1,7 @@
 package bachelorThesis.app.domain.useCase.locations
 
 import bachelorThesis.app.common.Resource
-import bachelorThesis.app.data.remote.dto.LocationDto
+import bachelorThesis.app.data.model.dto.LocationDto
 import bachelorThesis.app.domain.repository.Repository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

@@ -1,22 +1,22 @@
 package bachelorThesis.app.domain.repository
 
 import bachelorThesis.app.common.Resource
-import bachelorThesis.app.data.remote.dto.Device
-import bachelorThesis.app.data.remote.dto.DeviceCredentials
-import bachelorThesis.app.data.remote.dto.GeofenceVertex
-import bachelorThesis.app.data.remote.dto.LocationDto
-import bachelorThesis.app.data.remote.dto.TokenJson
-import bachelorThesis.app.data.remote.dto.UserRequest
+import bachelorThesis.app.data.model.dto.Device
+import bachelorThesis.app.data.model.dto.LocationDto
+import bachelorThesis.app.data.model.dto.TokenDto
+import bachelorThesis.app.data.model.json.DeviceCredentialsJson
+import bachelorThesis.app.data.model.json.UserJson
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 
 interface Repository {
-    fun register(payload: UserRequest): Flow<Resource<Int>>
+    fun register(payload: UserJson): Flow<Resource<Int>>
 
-    fun login(payload: UserRequest): Flow<Resource<TokenJson>>
+    fun login(payload: UserJson): Flow<Resource<TokenDto>>
 
     fun getDevices(credentials: String): Flow<Resource<List<Device>>>
 
-    fun addDevice(credentials: String, payload: DeviceCredentials): Flow<Resource<Int>>
+    fun addDevice(credentials: String, payload: DeviceCredentialsJson): Flow<Resource<Int>>
 
     fun removeDevice(credentials: String, deviceId: String): Flow<Resource<Boolean>>
 
@@ -24,9 +24,9 @@ interface Repository {
 
     fun getAllLocations(credentials: String, deviceId: String, limit: Int): Flow<Resource<List<LocationDto>>>
 
-    fun getGeofence(credentials: String, deviceId: String): Flow<Resource<List<GeofenceVertex>>>
+    fun getGeofence(credentials: String, deviceId: String): Flow<Resource<List<LatLng>>>
 
-    fun addGeofence(credentials: String, deviceId: String, vertices: List<GeofenceVertex>): Flow<Resource<String>>
+    fun addGeofence(credentials: String, deviceId: String, vertices: List<LatLng>): Flow<Resource<String>>
 
     fun removeGeofence(credentials: String, deviceId: String): Flow<Resource<String>>
 

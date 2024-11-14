@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import bachelorThesis.app.common.Resource
-import bachelorThesis.app.data.remote.dto.TokenJson
-import bachelorThesis.app.data.remote.dto.UserRequest
+import bachelorThesis.app.data.model.dto.TokenDto
+import bachelorThesis.app.data.model.json.UserJson
 import bachelorThesis.app.domain.useCase.dataStore.ClearDataUseCase
 import bachelorThesis.app.domain.useCase.dataStore.SetJwtTokenUseCase
 import bachelorThesis.app.domain.useCase.users.LoginUseCase
@@ -30,8 +30,8 @@ class LoginScreenViewModel @Inject constructor(
 
 
     suspend fun logIn() {
-        val userRequest = UserRequest(state.value.username, state.value.password)
-        loginUseCase(userRequest).onEach { result: Resource<TokenJson> ->
+        val userRequest = UserJson(state.value.username, state.value.password)
+        loginUseCase(userRequest).onEach { result: Resource<TokenDto> ->
             when (result) {
                 is Resource.Loading<*> -> {
                     setLoading(true)
@@ -83,7 +83,7 @@ class LoginScreenViewModel @Inject constructor(
             password = newValue
         )
     }
-    fun setLoading(newValue: Boolean) {
+    private fun setLoading(newValue: Boolean) {
         _state.value = state.value.copy(
             isLoading = newValue
         )

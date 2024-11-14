@@ -42,7 +42,7 @@ fun Route.geofenceVerticesDefault(jwtService: JWTService) {
                         call.respond(HttpStatusCode.Conflict, "This Geofence belongs to different device")
                     }
                 } else {
-                    call.respond(HttpStatusCode.Unauthorized)
+                    call.respond(HttpStatusCode.Unauthorized, "Device doesn't exist")
                 }
             }
         }
@@ -67,7 +67,7 @@ fun Route.geofenceVerticesDefault(jwtService: JWTService) {
                         call.respond(HttpStatusCode.Conflict, "This Geofence belongs to different device")
                     }
                 } else {
-                    call.respond(HttpStatusCode.Unauthorized)
+                    call.respond(HttpStatusCode.Unauthorized, "Device doesn't exist")
                 }
             }
         }
@@ -92,7 +92,7 @@ fun Route.geofenceVerticesDefault(jwtService: JWTService) {
                         call.respond(HttpStatusCode.Conflict, "This Geofence belongs to different device")
                     }
                 } else {
-                    call.respond(HttpStatusCode.Unauthorized)
+                    call.respond(HttpStatusCode.Unauthorized, "Device doesn't exist")
                 }
             }
         }

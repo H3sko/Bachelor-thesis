@@ -9,10 +9,9 @@ import androidx.lifecycle.viewModelScope
 import bachelorThesis.app.common.DELAY_REFRESH
 import bachelorThesis.app.common.Resource
 import bachelorThesis.app.common.defaultZoom
-import bachelorThesis.app.data.remote.dto.Device
-import bachelorThesis.app.data.remote.dto.DeviceCredentials
-import bachelorThesis.app.data.remote.dto.GeofenceVertex
-import bachelorThesis.app.data.remote.dto.LocationDto
+import bachelorThesis.app.data.model.dto.Device
+import bachelorThesis.app.data.model.dto.LocationDto
+import bachelorThesis.app.data.model.json.DeviceCredentialsJson
 import bachelorThesis.app.domain.useCase.dataStore.ClearDataUseCase
 import bachelorThesis.app.domain.useCase.dataStore.GetJwtTokenUseCase
 import bachelorThesis.app.domain.useCase.devices.AddDeviceUseCase
@@ -87,12 +86,13 @@ class MapScreenViewModel @Inject constructor(
                                         }
                                     }.launchIn(viewModelScope)
                             } else {
+                                setError("Failed to retrieve the user token, please re-login")
                                 Log.w("MainActivity", "Fetching FCM registration token failed", task.exception)
                             }
                         }
                     token = "Bearer $result"
                     getDevicesFromDb()
-                    getPeriodicLocations() // TODO: toto mozno nebude fungovat a treba to spravit v LaunchedEffecte (chatGPT hovori ze idealne vo ViewModeli)
+                    getPeriodicLocations()
                 } else {
                     setError("Please re-login")
                 }
@@ -176,7 +176,7 @@ class MapScreenViewModel @Inject constructor(
     }
 
     fun addDeviceToDb(name: String, owner: String) {
-        addDeviceUseCase(credentials = token, DeviceCredentials(name, owner))
+        addDeviceUseCase(credentials = token, DeviceCredentialsJson(name, owner))
             .onEach { result ->
                 when (result) {
                     is Resource.Loading -> {}
@@ -371,7 +371,6 @@ class MapScreenViewModel @Inject constructor(
                         is Resource.Loading -> {}
                         is Resource.Success -> {
                             setShowGeofence(false)
-                            Log.d("removeGeofence()", "sme tu")
                             removeGeofence()
                         }
                         is Resource.Error -> {
@@ -391,7 +390,7 @@ class MapScreenViewModel @Inject constructor(
 
     fun addGeofencePoint(latLng: LatLng) {
         val currentVertices = _state.value.addedGeofenceVertices.toMutableList()
-        currentVertices.add(GeofenceVertex(latLng.latitude, latLng.longitude))
+        currentVertices.add(LatLng(latLng.latitude, latLng.longitude))
         _state.value = _state.value.copy(addedGeofenceVertices = emptyList())
         _state.value = _state.value.copy(addedGeofenceVertices = currentVertices)
 }
@@ -430,20 +429,20 @@ class MapScreenViewModel @Inject constructor(
         )
     }
 
-    fun setDeviceGeofenceVertices(vertices: List<GeofenceVertex>) {
+    fun setDeviceGeofenceVertices(vertices: List<LatLng>) {
         _state.value = state.value.copy(
             deviceGeofenceVertices = vertices
         )
     }
 
-    fun removeDevice(deviceId: Int) {
+    private fun removeDevice(deviceId: Int) {
         val updatedDevices = state.value.devices.filter { it.id != deviceId }
         _state.value = state.value.copy(
             devices = updatedDevices
         )
     }
 
-    fun addDevice(newDevice: Device) {
+    private fun addDevice(newDevice: Device) {
         _state.value = state.value.copy(
             devices = state.value.devices + newDevice
         )
@@ -498,7 +497,7 @@ class MapScreenViewModel @Inject constructor(
         )
     }
 
-    fun setAddedGeofenceVertices(newValue: List<GeofenceVertex>) {
+    fun setAddedGeofenceVertices(newValue: List<LatLng>) {
         _state.value = state.value.copy(
             addedGeofenceVertices = newValue
         )
@@ -533,6 +532,6 @@ class MapScreenViewModel @Inject constructor(
                         }
                     }
                 }
-            }.launchIn(viewModelScope) // TODO: zistit ci toto tu mat byt
+            }.launchIn(viewModelScope)
     }
 }

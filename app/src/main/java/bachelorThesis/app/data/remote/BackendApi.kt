@@ -1,14 +1,14 @@
 package bachelorThesis.app.data.remote
 
-import bachelorThesis.app.data.remote.dto.DeviceDto
-import bachelorThesis.app.data.remote.dto.DeviceJson
-import bachelorThesis.app.data.remote.dto.FcmTokenJson
-import bachelorThesis.app.data.remote.dto.GeofenceVertex
-import bachelorThesis.app.data.remote.dto.LocationDto
-import bachelorThesis.app.data.remote.dto.NotificationSwitchJson
-import bachelorThesis.app.data.remote.dto.Response
-import bachelorThesis.app.data.remote.dto.TokenJson
-import bachelorThesis.app.data.remote.dto.UserJson
+import bachelorThesis.app.data.model.dto.DeviceDto
+import bachelorThesis.app.data.model.dto.LocationDto
+import bachelorThesis.app.data.model.dto.MessageDto
+import bachelorThesis.app.data.model.dto.TokenDto
+import bachelorThesis.app.data.model.json.DeviceJson
+import bachelorThesis.app.data.model.json.FcmTokenJson
+import bachelorThesis.app.data.model.json.NotificationSwitchJson
+import bachelorThesis.app.data.model.json.UserJson
+import com.google.android.gms.maps.model.LatLng
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -28,7 +28,7 @@ interface BackendApi {
 
     @Headers("Content-Type: application/json")
     @POST("user/login")
-    suspend fun login(@Body payload: UserJson): TokenJson
+    suspend fun login(@Body payload: UserJson): TokenDto
 
     @GET("device/getUserDevices")
     suspend fun getDevices(@Header("Authorization") credentials: String): List<DeviceDto>
@@ -47,21 +47,20 @@ interface BackendApi {
     suspend fun getAllLocations(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String, @Query("limit") limit: Int): List<LocationDto>
 
     @GET("geofence/device/{deviceId}")
-    suspend fun getGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): List<GeofenceVertex>
+    suspend fun getGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): List<LatLng>
 
     @Headers("Content-Type: application/json")
     @POST("geofence/add/{deviceId}")
-    suspend fun addGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String, @Body vertices: List<GeofenceVertex>): Response
+    suspend fun addGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String, @Body vertices: List<LatLng>): MessageDto
 
     @DELETE("geofence/delete/device/{deviceId}")
-    suspend fun removeGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): Response
+    suspend fun removeGeofence(@Header("Authorization") credentials: String, @Path("deviceId") deviceId: String): MessageDto
 
-    // TODO: mozno pridat     @Headers("Content-Type: application/json")
     @POST("onlineUser/add")
-    suspend fun addFcmToken(@Header("Authorization") credentials: String, @Body payload: FcmTokenJson): Response
+    suspend fun addFcmToken(@Header("Authorization") credentials: String, @Body payload: FcmTokenJson): MessageDto
 
     @DELETE("onlineUser/remove")
-    suspend fun removeFcmToken(@Header("Authorization") credentials: String): Response
+    suspend fun removeFcmToken(@Header("Authorization") credentials: String): MessageDto
 
     @PUT("onlineUser/notification/switch")
     suspend fun putNotificationStatus(@Header("Authorization") credentials: String, @Body payload: NotificationSwitchJson): Boolean

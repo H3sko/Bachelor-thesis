@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import bachelorThesis.app.common.Resource
-import bachelorThesis.app.data.remote.dto.UserRequest
+import bachelorThesis.app.data.model.json.UserJson
 import bachelorThesis.app.domain.useCase.users.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -24,7 +24,7 @@ class RegistrationScreenViewModel @Inject constructor(
 
 
      fun register() {
-        val userRequest = UserRequest(state.value.username, state.value.password)
+        val userRequest = UserJson(state.value.username, state.value.password)
         registerUseCase(userRequest).onEach { result: Resource<Int> ->
             when (result) {
                 is Resource.Loading<*> -> {
@@ -64,7 +64,7 @@ class RegistrationScreenViewModel @Inject constructor(
             password = newValue
         )
     }
-    fun setLoading(newValue: Boolean) {
+    private fun setLoading(newValue: Boolean) {
         _state.value = state.value.copy(
             isLoading = newValue
         )

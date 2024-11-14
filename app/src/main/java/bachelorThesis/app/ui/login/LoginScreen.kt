@@ -36,9 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import bachelorThesis.app.ui.destinations.HomeScreenDestination
@@ -83,11 +81,6 @@ fun LoginScreen(
     ) {
         if (state.success) {
             navigator.navigate(MapScreenDestination())
-            // TODO: len na testovanie loginu
-//            SuccessfulLogin(
-//                navigator,
-//                viewModel::logOut
-//            )
         } else {
             LoginScreenContent(
                 state,
@@ -99,37 +92,6 @@ fun LoginScreen(
         }
     }
 }
-
-@Composable
-fun SuccessfulLogin( // TODO: toto som pouzival asi len na testovanie takze mozno vymazat
-    navigator: DestinationsNavigator,
-    logOut: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Yay, successfully logged in!",
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        Button(
-            onClick = {
-                logOut()
-                navigator.navigate(HomeScreenDestination())
-            }
-        ) {
-            Text(text = "Log Out")
-        }
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination

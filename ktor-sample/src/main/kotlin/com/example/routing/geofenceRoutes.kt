@@ -69,10 +69,10 @@ fun Route.geofencesDefault(jwtService: JWTService) {
                             val vertices: List<GeofenceVertex> = geofenceVerticesService.getAll(geofenceId).map { GeofenceVertex(it.latitude, it.longitude) }
                             call.respond(HttpStatusCode.OK, vertices)
                         } else {
-                            call.respond(HttpStatusCode.NotFound)
+                            call.respond(HttpStatusCode.NotFound, "Geofence doesn't exist")
                         }
                     } else {
-                        call.respond(HttpStatusCode.Unauthorized, "Device $deviceId belongs to other user")
+                        call.respond(HttpStatusCode.Unauthorized, "Device $deviceId belongs to another user")
                     }
                 } else {
                     call.respond(HttpStatusCode.BadRequest, "Device $deviceId not found")

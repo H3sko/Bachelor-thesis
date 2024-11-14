@@ -92,16 +92,19 @@ fun MapScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val state by viewModel.state
 
-    LaunchedEffect(state) {
+    LaunchedEffect(state.error) {
         if (state.error != null) {
-            localCoroutineScope.launch { snackbarHostState.showSnackbar(
-                message = state.error!!,
-                duration = SnackbarDuration.Short
-            )}
+            localCoroutineScope.launch {
+                snackbarHostState.showSnackbar(
+                    message = state.error!!,
+                    duration = SnackbarDuration.Short
+                )
+                viewModel.setError(null)
+            }
         }
     }
     LaunchedEffect(state.device) {
-        state.device?.let { device ->
+        state.device?.let {
             viewModel.getLocationFromDb()
             viewModel.getAllLocationsFromDb()
             viewModel.getGeofenceFromDb()
@@ -592,7 +595,6 @@ fun NotificationsContent(
     onBackToMenu: () -> Unit
 ) {
     val isNotificationsEnabled = state.geofenceNotificationStatus
-    val coroutineScope = rememberCoroutineScope()
 
     NavigationDrawerItem(
         label = { Text(text = "Back to Menu") },
@@ -726,7 +728,7 @@ private fun MapScreenContent(
                 )
             } else {
                 viewModel.setError("This device does not have a geofence")
-                viewModel.setError(null) // TODO: mozno bude spamovat?
+                viewModel.setShowGeofence(false)
             }
         }
         if (state.addedGeofenceVertices.isNotEmpty()) {
