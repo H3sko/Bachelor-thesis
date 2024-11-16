@@ -1,13 +1,14 @@
 plugins {
-    id("com.android.application")
+    id("com.android.application") version "8.7.2"
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
     id("dagger.hilt.android.plugin")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
+    alias(libs.plugins.compose.compiler)
 }
 
 
@@ -78,75 +79,80 @@ kotlin {
 
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.compose.compiler:compiler:1.5.13")
-    implementation("androidx.compose.ui:ui:1.7.4")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.7.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.activity:activity-compose:1.9.0")
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.compose.foundation:foundation:1.7.4")
-    implementation("androidx.compose.runtime:runtime-livedata:1.7.4")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.4")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.7.4")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
+    // Core Libraries
+    implementation(libs.androidx.core.ktx.v100alpha03)
+    implementation(libs.androidx.compiler)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.foundation)
 
-    implementation("androidx.fragment:fragment-ktx:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
+    // UI Libraries
+    implementation(libs.ui)
+    implementation(libs.ui.tooling)
+    implementation(libs.ui.tooling.preview)
+    debugImplementation(libs.ui.tooling)
+    implementation(libs.material3)
+    implementation(libs.androidx.activity.compose.v193)
 
-    implementation("androidx.navigation:navigation-compose:2.8.0-alpha08")
+    // Lifecycle & LiveData
+    implementation(libs.androidx.lifecycle.runtime.ktx.v287)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.core)
+
+    // Fragment
+    implementation(libs.androidx.fragment.ktx)
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
 
-    // Coroutine Lifecycle Scopes
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0-rc01")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    // Dagger - Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    kapt(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
-    //Dagger - Hilt
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    // Retrofit and Networking
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.14")
+    // Data Persistence - Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
-    // DataStore
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    // Data Persistence - DataStore
+    implementation(libs.androidx.datastore.preferences)
 
-    // Room
-    implementation("androidx.room:room-runtime:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
+    // Maps
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
 
-    // Kotlin  ensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:2.6.1")
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
 
-    //Navigation
-    implementation("io.github.raamcosta.compose-destinations:core:1.11.4-alpha")
-    ksp("io.github.raamcosta.compose-destinations:ksp:1.11.4-alpha")
+    // Swipe to Refresh
+    implementation(libs.accompanist.swiperefresh)
 
-    //Maps
-    implementation("com.google.maps.android:maps-compose:5.0.1")
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.messaging.directboot)
 
-    //Serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    // Testing Libraries
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit.v121)
+    androidTestImplementation(libs.androidx.espresso.core.v361)
+    androidTestImplementation(libs.ui.test.junit4)
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.android.compiler)
 
-    //Swipe to refresh
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.34.0")
-
-    //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
-    implementation("com.google.firebase:firebase-messaging")
-    implementation("com.google.firebase:firebase-messaging-directboot:20.2.0")
+    // Additional Dependencies
+    ksp(libs.ksp)
 }

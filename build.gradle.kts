@@ -1,20 +1,23 @@
 buildscript {
     dependencies {
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.49")
-        classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
+        classpath(libs.gradle)
+        classpath(libs.hilt.android.gradle.plugin)
+        classpath(libs.secrets.gradle.plugin)
     }
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
 
 }
 plugins {
-    id("com.android.application") version "8.3.0" apply false
-    id("com.android.library") version "8.3.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.23" apply false
+    id("com.android.application") version "8.7.2" apply false
+    id("com.android.library") version "8.7.2" apply false
+    id("org.jetbrains.kotlin.android") version "2.0.21" apply false
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1" apply false
-    id("com.google.devtools.ksp") version "1.9.23-1.0.20" apply false
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27" apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
     kotlin("kapt") version "1.9.23"
+    alias(libs.plugins.compose.compiler) apply false
 }
