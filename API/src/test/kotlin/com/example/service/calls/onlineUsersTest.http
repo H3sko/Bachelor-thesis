@@ -1,0 +1,47 @@
+POST http://127.0.0.1:8080/onlineUser/add
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODQ5NjI2NX0.cYFAhTpHxBfNPlHvKawMLfPWYrJSyOIu9HLDv8s8fuA
+
+{
+  "token" : "abcdef",
+  "activeNotification" : false
+}
+
+###
+DELETE http://127.0.0.1:8080/onlineUser/remove
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODQ5NjI2NX0.cYFAhTpHxBfNPlHvKawMLfPWYrJSyOIu9HLDv8s8fuA
+
+###
+PUT http://127.0.0.1:8080/onlineUser/notification/switch
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODQ5NjI2NX0.cYFAhTpHxBfNPlHvKawMLfPWYrJSyOIu9HLDv8s8fuA
+
+{
+  "activeNotification" : true
+}
+
+### ADMIN requests
+###
+POST http://127.0.0.1:8080/onlineUser/add/57
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MjgxMzkyMDJ9.lJYyNmGBzNzHGq9dLwaF1ATP8DLWU4YHIdcAzTHeqzs
+
+{
+  "token" : "aaaaa"
+}
+
+###
+DELETE http://127.0.0.1:8080/onlineUser/remove/57
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MjgxMzkyMDJ9.lJYyNmGBzNzHGq9dLwaF1ATP8DLWU4YHIdcAzTHeqzs
+
+###
+GET http://127.0.0.1:8080/onlineUser/getAll
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MjgxMzkyMDJ9.lJYyNmGBzNzHGq9dLwaF1ATP8DLWU4YHIdcAzTHeqzs
+
+###
+DELETE http://127.0.0.1:8080/onlineUser/deleteAll
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoiYWRtaW4iLCJleHAiOjM2MDAwMDE3MjgxMzkyMDJ9.lJYyNmGBzNzHGq9dLwaF1ATP8DLWU4YHIdcAzTHeqzs
