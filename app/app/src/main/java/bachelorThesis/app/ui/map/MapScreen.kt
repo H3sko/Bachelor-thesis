@@ -3,6 +3,7 @@
 package bachelorThesis.app.ui.map
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,17 +15,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
+import androidx.compose.material3.DrawerDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -157,7 +159,7 @@ fun MapScreen(
             floatingActionButton = {
                 if (!state.addingGeofence) {
                     Row(
-                        horizontalArrangement = Arrangement.Center, // TODO: .spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.Center,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
@@ -168,7 +170,7 @@ fun MapScreen(
                                     viewModel.setShowLocationHistory(!state.showLocationHistory)
                                 }
                             },
-                            containerColor = if (state.locationHistory.isNotEmpty()) colorScheme.primary else colorScheme.secondary // TODO: dobra myslienka ale prerobit tie colorSchemes preboha
+                            containerColor = colorScheme.primary
                         ) {
                             Icon(
                                 painter = painterResource(id = IconResource.Route.id),
@@ -312,46 +314,61 @@ fun MainMenuContent(
     onNavigateToGeofence: () -> Unit,
     onNavigateToNotifications: () -> Unit
 ) {
-    NavigationDrawerItem(
-        onClick = { closeDrawer() },
-        icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
-        label = { Text(text = "Home") },
-        selected = false
-    )
-    HorizontalDivider()
-    NavigationDrawerItem(
-        label = { Text(text = "Add new device") },
-        selected = false,
-        onClick = { onNavigateToAddDevice() }
-    )
-    HorizontalDivider()
-    NavigationDrawerItem(
-        label = { Text(text = "My devices") },
-        selected = false,
-        onClick = { onNavigateToMyDevices() }
-    )
-    HorizontalDivider()
-    NavigationDrawerItem(
-        label = { Text(text = "Geofence") },
-        selected = false,
-        onClick = { onNavigateToGeofence() }
-    )
-    HorizontalDivider()
-    NavigationDrawerItem(
-        label = { Text(text = "Notifications") },
-        selected = false,
-        onClick = { onNavigateToNotifications() }
-    )
-    HorizontalDivider()
-    NavigationDrawerItem(
-        label = { Text(text = "Logout") },
-        selected = false,
-        onClick = {
-            localCoroutineScope.launch { viewModel.setLogout() }
-            navigator.navigate(HomeScreenDestination)
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            NavigationDrawerItem(
+                onClick = { closeDrawer() },
+                icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
+                label = {  },
+                selected = false
+            )
+            HorizontalDivider()
+            NavigationDrawerItem(
+                label = { Text(text = "Add new AirTag") },
+                selected = false,
+                onClick = { onNavigateToAddDevice() }
+            )
+            HorizontalDivider()
+            NavigationDrawerItem(
+                label = { Text(text = "My AirTags") },
+                selected = false,
+                onClick = { onNavigateToMyDevices() }
+            )
+            HorizontalDivider()
+            NavigationDrawerItem(
+                label = { Text(text = "Geofence") },
+                selected = false,
+                onClick = { onNavigateToGeofence() }
+            )
+            HorizontalDivider()
+            NavigationDrawerItem(
+                label = { Text(text = "Notifications") },
+                selected = false,
+                onClick = { onNavigateToNotifications() }
+            )
+            HorizontalDivider()
         }
-    )
+
+        Button(
+            onClick = {
+                localCoroutineScope.launch { viewModel.setLogout() }
+                navigator.navigate(HomeScreenDestination)
+            },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        ) {
+            Text(text = "Logout")
+        }
+    }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -394,10 +411,16 @@ fun SwipeableNavigationDrawerItem(
             label = { Text(text) },
             selected = false,
             onClick = onItemClicked,
-            icon = { Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = null) },
+            icon = {
+                Image(
+                    painter = painterResource(id = IconResource.Airtag.id),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(DrawerDefaults.modalContainerColor)
                 .clipToBounds()
         )
     }
@@ -424,64 +447,74 @@ fun AddNewDeviceContent(
             }
         }
     }
-
-    NavigationDrawerItem(
-        label = { Text(text = "Back to Menu") },
-        icon = { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) },
-        selected = false,
-        onClick = {
-            onBackToMenu()
-            viewModel.setMessage(null)
-        }
-    )
-    HorizontalDivider()
-
-    Column(modifier = Modifier.padding(16.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Add New Device",
-                style = MaterialTheme.typography.bodyLarge,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = deviceName,
-            onValueChange = { deviceName = it },
-            label = { Text("Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = deviceOwner,
-            onValueChange = { deviceOwner = it },
-            label = { Text("Owner") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                viewModel.addDeviceToDb(deviceName, deviceOwner)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        NavigationDrawerItem(
+            label = { },
+            icon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null
+                )
             },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Submit")
-        }
+            selected = false,
+            onClick = {
+                onBackToMenu()
+                viewModel.setMessage(null)
+            }
+        )
+        HorizontalDivider()
 
-        if (successMessage.isNotEmpty()) {
-            Text(
-                text = successMessage,
-                color = if (state.message == "Airtag added successfully!") Color.Green else Color.Red,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 16.dp)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Add New AirTag",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextField(
+                value = deviceName,
+                onValueChange = { deviceName = it },
+                label = { Text("Name") },
+                modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                value = deviceOwner,
+                onValueChange = { deviceOwner = it },
+                label = { Text("Owner") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    viewModel.addDeviceToDb(deviceName, deviceOwner)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Submit")
+            }
+
+            if (successMessage.isNotEmpty()) {
+                Text(
+                    text = successMessage,
+                    color = if (state.message == "Airtag added successfully!") Color.Green else Color.Red,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
         }
     }
 }
@@ -493,34 +526,49 @@ fun MyDevicesContent(
     onBackToMenu: () -> Unit,
     closeDrawer: () -> Unit,
 ) {
-    NavigationDrawerItem(
-        label = { Text(text = "Back to Menu") },
-        icon = { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) },
-        selected = false,
-        onClick = { onBackToMenu() }
-    )
-    HorizontalDivider()
-
-    if ( state.devices.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "No Devices", style = MaterialTheme.typography.bodyLarge)
-        }
-    } else {
-        LazyColumn {
-            items(state.devices, key = { device -> device.id }) { device ->
-                SwipeableNavigationDrawerItem(
-                    text = device.name,
-                    onDelete = { viewModel.removeDeviceFromDb(device.id) },
-                    onItemClicked = {
-                        closeDrawer()
-                        viewModel.setDevice(device)
-                    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        NavigationDrawerItem(
+            label = { },
+            icon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null
                 )
-                HorizontalDivider()
+            },
+            selected = false,
+            onClick = {
+                onBackToMenu()
+                viewModel.setMessage(null)
+            }
+        )
+        HorizontalDivider()
+
+        if (state.devices.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "No AirTags", style = MaterialTheme.typography.bodyLarge)
+            }
+        } else {
+            LazyColumn {
+                items(state.devices, key = { device -> device.id }) { device ->
+                    SwipeableNavigationDrawerItem(
+                        text = device.name,
+                        onDelete = { viewModel.removeDeviceFromDb(device.id) },
+                        onItemClicked = {
+                            closeDrawer()
+                            viewModel.setDevice(device)
+                        }
+                    )
+                    HorizontalDivider()
+                }
             }
         }
     }
@@ -533,16 +581,54 @@ fun GeofenceContent(
     onBackToMenu: () -> Unit,
     closeDrawer: () -> Unit,
 ) {
-    NavigationDrawerItem(
-        label = { Text(text = "Back to Menu") },
-        icon = { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) },
-        selected = false,
-        onClick = { onBackToMenu() }
-    )
-    HorizontalDivider()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        NavigationDrawerItem(
+            label = {  },
+            icon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null
+                )
+            },
+            selected = false,
+            onClick = { onBackToMenu() }
+        )
+        HorizontalDivider()
 
-    if (state.device != null) {
-        if (state.deviceGeofenceVertices.isEmpty()) {
+        if (state.device != null) {
+            if (state.deviceGeofenceVertices.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = {
+                            viewModel.setAddingGeofence(true)
+                            closeDrawer()
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(text = "Create Geofence")
+                    }
+                }
+            } else {
+                SwipeableNavigationDrawerItem(
+                    text = "${state.device.name}'s Geofence",
+                    onDelete = { viewModel.removeGeofenceFromDb() },
+                    onItemClicked = {
+                        viewModel.setShowGeofence(!state.showGeofence)
+                        closeDrawer()
+                    }
+                )
+            }
+        } else {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -550,40 +636,12 @@ fun GeofenceContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Button(
-                    onClick = {
-                        viewModel.setAddingGeofence(true)
-                        closeDrawer()
-                    },
+                Text(
+                    text = "No AirTag selected",
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
-                ) {
-                    Text(text = "Create Geofence")
-                }
+                )
             }
-        }
-        else {
-            SwipeableNavigationDrawerItem(
-                text = "${state.device.name}'s Geofence",
-                onDelete = { viewModel.removeGeofenceFromDb() },
-                onItemClicked = {
-                    viewModel.setShowGeofence(!state.showGeofence)
-                    closeDrawer()
-                }
-            )
-        }
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "No device selected.",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
         }
     }
 }
@@ -596,21 +654,32 @@ fun NotificationsContent(
 ) {
     val isNotificationsEnabled = state.geofenceNotificationStatus
 
-    NavigationDrawerItem(
-        label = { Text(text = "Back to Menu") },
-        icon = { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) },
-        selected = false,
-        onClick = { onBackToMenu() }
-    )
-    HorizontalDivider()
-
-    Column {
-        DrawerItemWithSwitch(
-            label = "Enable Geofence Alerts",
-            description = "Get notified when your device enters or leaves a designated area.",
-            isChecked = isNotificationsEnabled,
-            onCheckedChange = { viewModel.toggleGeofenceNotification() }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        NavigationDrawerItem(
+            label = {  },
+            icon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null
+                )
+            },
+            selected = false,
+            onClick = { onBackToMenu() }
         )
+        HorizontalDivider()
+
+        Column {
+            DrawerItemWithSwitch(
+                label = "Enable Geofence Alerts",
+                description = "Get notified when your AirTag leaves the designated area.",
+                isChecked = isNotificationsEnabled,
+                onCheckedChange = { viewModel.toggleGeofenceNotification() }
+            )
+        }
     }
 }
 
@@ -647,7 +716,7 @@ fun DrawerItemWithSwitch(
         }
 
         if (isExpanded.value) {
-            Text(text = "A geofence is a virtual boundary. When your device enters or leaves this area, you will receive an alert.")
+            Text(text = "A geofence is a virtual boundary. When your AirTag leaves this area, you will receive an alert.")
         }
     }
 }
@@ -710,8 +779,8 @@ private fun MapScreenContent(
             }
         }
     ) {
-        if (state.locationLatest != null) { // TODO: pridat nejaku icon mozno
-            Marker(state = rememberMarkerState(position = LatLng(state.locationLatest!!.latitude, state.locationLatest!!.longitude))) // TODO: upravit marker nech je krajsi
+        if (state.locationLatest != null) { // TODO: pridat nejaku icon mozno, upravit marker nech je krajsi
+            Marker(state = rememberMarkerState(position = LatLng(state.locationLatest!!.latitude, state.locationLatest!!.longitude)))
         }
         if (state.locationHistory.isNotEmpty()) {
             if (state.showLocationHistory) {
@@ -727,14 +796,16 @@ private fun MapScreenContent(
                     strokeJointType = JointType.BEVEL
                 )
             } else {
-                viewModel.setError("This device does not have a geofence")
+                viewModel.setError("This AirTag does not have a geofence")
                 viewModel.setShowGeofence(false)
             }
         }
         if (state.addedGeofenceVertices.isNotEmpty()) {
             if (state.addingGeofence) {
                 for (point in state.addedGeofenceVertices) {
-                    Marker(state = rememberMarkerState(position = LatLng(point.latitude, point.longitude))) // TODO: iny marker
+                    Marker(
+                        state = rememberMarkerState(position = LatLng(point.latitude, point.longitude))
+                    )
                 }
             }
         }

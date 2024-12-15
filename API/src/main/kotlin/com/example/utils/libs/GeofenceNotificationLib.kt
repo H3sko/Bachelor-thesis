@@ -1,8 +1,12 @@
 package com.example.utils.libs
 
+import com.example.data.service.OnlineUserService
+import com.example.models.ExposedDeviceResponse
 import com.example.models.ExposedGeofenceVertices
 import com.example.models.ExposedLocations
 import com.example.models.GeofenceNotification
+import com.example.service.GeofenceService
+import com.example.service.GeofenceVerticesService
 import com.google.firebase.messaging.AndroidConfig
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
@@ -123,6 +127,39 @@ fun mercator(latRad: Double): Double {
 
 private fun tanLatGC(lat1: Double, lat2: Double, lng2: Double, lng3: Double): Double {
     return (tan(lat1) * sin(lng2 - lng3) + tan(lat2) * sin(lng3)) / sin(lng2)
+}
+
+suspend fun handleGeofenceNotification(
+    device: ExposedDeviceResponse,
+    newLocation: ExposedLocations
+) {
+    val geofenceService = GeofenceService()
+    val geofenceVerticesService = GeofenceVerticesService()
+    val onlineUserService = OnlineUserService()
+
+    val deviceGeofenceId: Int? = geofenceService.getGeofence(device.id)
+
+    if (deviceGeofenceId != null) {
+        val deviceGeofenceVertices: List<ExposedGeofenceVertices> = geofenceVerticesService.getAll(deviceGeofenceId)
+
+        if (deviceGeofenceVertices.isNotEmpty()) {
+            val isInsideGeofence = isLocationInsidePolygon(newLocation, deviceGeofenceVertices)
+
+            if (!isInsideGeofence) {
+                val onlineUser: Pair<String, Boolean>? = onlineUserService.getOnlineUserByUserId(device.userId)
+                if (onlineUser != null && onlineUser.second) {
+                    sendGeofenceNotification(
+                        onlineUser.first,
+                        GeofenceNotification(
+                            title = "Warning",
+                            deviceId = device.id,
+                            deviceName = device.name
+                        )
+                    )
+                }
+            }
+        }
+    }
 }
 
 fun sendGeofenceNotification(token: String, geofenceNotification: GeofenceNotification) {

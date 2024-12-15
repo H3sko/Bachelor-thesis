@@ -1,19 +1,18 @@
 package com.example.quartz.jobs
 
 import com.example.data.service.DeviceService
+import com.example.models.ExposedDeviceResponse
 import com.example.models.ExposedLocations
 import com.example.service.LocationsService
 import com.example.utils.ITEMS_DATA_PATH
 import com.example.utils.libs.fetchDataFromFile
+import com.example.utils.libs.formatTimestamp
+import com.example.utils.libs.handleGeofenceNotification
 import kotlinx.coroutines.runBlocking
 import org.quartz.Job
 import org.quartz.JobExecutionContext
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 class DataFetchJob : Job {
-
    override fun execute(context: JobExecutionContext?) {
       val deviceService = DeviceService()
       val locationsService = LocationsService()
@@ -41,17 +40,20 @@ class DataFetchJob : Job {
 
                      if (lastLocation == null || location != lastLocation) {
                         locationsService.create(location)
+
+                        // Handle geofence notification
+                        val device = deviceService.readById(pair.first)
+                        if (device != null) {
+                           handleGeofenceNotification(
+                              ExposedDeviceResponse(pair.first, device.userId, device.name, device.serialNumber),
+                              location
+                           )
+                        }
                      }
                   }
                }
             }
          }
       }
-   }
-
-   private fun formatTimestamp(timestamp: Long): String {
-      val instant = Instant.ofEpochMilli(timestamp)
-      val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(ZoneId.systemDefault())
-      return formatter.format(instant)
    }
 }

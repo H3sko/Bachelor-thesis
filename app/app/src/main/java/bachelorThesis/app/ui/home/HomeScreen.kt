@@ -187,16 +187,16 @@ fun HomeScreenTopBar(
                 )
             }
         },
-        navigationIcon = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "DrawerIcon",
-                modifier = Modifier
-                    .clickable(onClick = {
-                        popBackStackCallback()
-                    })
-                    .padding(start = 10.dp)
-            )
-        }
+//        navigationIcon = {
+//            Icon(
+//                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                contentDescription = "DrawerIcon",
+//                modifier = Modifier
+//                    .clickable(onClick = {
+//                        popBackStackCallback()
+//                    })
+//                    .padding(start = 10.dp)
+//            )
+//        }
     )
 }
