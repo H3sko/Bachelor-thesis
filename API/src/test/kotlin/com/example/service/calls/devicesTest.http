@@ -1,4 +1,4 @@
-POST http://127.0.0.1:8080/device/add
+POST http://127.0.0.1:8080/device
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODQ5NjI2NX0.cYFAhTpHxBfNPlHvKawMLfPWYrJSyOIu9HLDv8s8fuA
 
@@ -8,12 +8,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwia
 }
 
 ###
-DELETE http://127.0.0.1:8080/device/remove/13
+DELETE http://127.0.0.1:8080/device/13
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODE0MzAwNX0.34Y76bWkxKs3QcSReTi-TsIWKMcSE9JP6fLtz7EeM_0
 
 ###
-GET http://127.0.0.1:8080/device/getUserDevices
+GET http://127.0.0.1:8080/device/all
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODEzOTMwNn0.1sVC2K55t3VRZVHFKVE89XjkQeMjbI4R7s7o-Z0Py5I
 

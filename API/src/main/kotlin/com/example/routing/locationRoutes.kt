@@ -7,7 +7,6 @@ import com.example.models.LocationDto
 import com.example.service.LocationsService
 import com.example.service.UserService
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -18,7 +17,7 @@ fun Route.locationsDefault(jwtService: JWTService) {
     val userService = UserService()
     val deviceService = DeviceService()
     route("/location") {
-        route("/getLatest/{deviceId}") {
+        route("/latest/device/{deviceId}") {
             get {
                 val deviceId = call.parameters["deviceId"]?.toInt()
                 val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
@@ -47,7 +46,7 @@ fun Route.locationsDefault(jwtService: JWTService) {
                 }
             }
         }
-        route("/getAll/{deviceId}") {
+        route("/all/device/{deviceId}") {
             get {
                 val deviceId = call.parameters["deviceId"]?.toInt()
                 val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
@@ -86,16 +85,14 @@ fun Route.locationsDefault(jwtService: JWTService) {
 fun Route.locationsAdmin() {
     val locationsService = LocationsService()
     route("/location") {
-        route("/add") {
-            post {
-                val location = call.receive<ExposedLocations>()
+        post {
+            val location = call.receive<ExposedLocations>()
 
-                if (locationsService.exists(location).not()) {
-                    val id = locationsService.create(location)
-                    call.respond(HttpStatusCode.Created, id)
-                } else {
-                    call.respond(HttpStatusCode.Conflict, "Location already exists")
-                }
+            if (locationsService.exists(location).not()) {
+                val id = locationsService.create(location)
+                call.respond(HttpStatusCode.Created, id)
+            } else {
+                call.respond(HttpStatusCode.Conflict, "Location already exists")
             }
         }
         route("/{id}") {

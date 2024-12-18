@@ -7,7 +7,6 @@ import com.example.models.OnlineUserRequest
 import com.example.models.SwitchRequest
 import com.example.service.UserService
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -17,44 +16,40 @@ fun Route.onlineUsersDefault(jwtService: JWTService) {
     val userService = UserService()
     val onlineUserService = OnlineUserService()
 
-    route("/onlineUser") {
-        route("/add") {
-            post {
-                val payload = call.receive<OnlineUserRequest>()
-                val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
-                    ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
-                val userId = username?.let { it1 -> userService.getUserId(it1) }
+    route("/online-user") {
+        post {
+            val payload = call.receive<OnlineUserRequest>()
+            val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+                ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
+            val userId = username?.let { it1 -> userService.getUserId(it1) }
 
-                if (payload.token != "") {
-                    if (userId != null) {
-                        val onlineUser = onlineUserService.getOnlineUserByUserId(userId.toInt())
-                        if (onlineUser != null) {
-                            onlineUserService.updateToken(userId.toInt(), payload.token)
-                            call.respond(HttpStatusCode.OK, mapOf("message" to "Users token has been updated"))
-                        } else {
-                            onlineUserService.create(ExposedOnlineUser(userId.toInt(), payload.token, payload.activeNotification))
-                            call.respond(HttpStatusCode.Created, mapOf("message" to "User is now online"))
-                        }
-                    } else {
-                        call.respond(HttpStatusCode.Unauthorized, mapOf("message" to "Invalid token"))
-                    }
-                } else {
-                    call.respond(HttpStatusCode.BadRequest, mapOf("message" to "Empty token received"))
-                }
-            }
-        }
-        route("/remove") {
-            delete {
-                val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
-                    ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
-                val userId = username?.let { it1 -> userService.getUserId(it1) }
-
+            if (payload.token != "") {
                 if (userId != null) {
-                    onlineUserService.removeUserOnline(userId)
-                    call.respond(HttpStatusCode.OK, mapOf("message" to "User is now offline"))
+                    val onlineUser = onlineUserService.getOnlineUserByUserId(userId.toInt())
+                    if (onlineUser != null) {
+                        onlineUserService.updateToken(userId.toInt(), payload.token)
+                        call.respond(HttpStatusCode.OK, mapOf("message" to "Users token has been updated"))
+                    } else {
+                        onlineUserService.create(ExposedOnlineUser(userId.toInt(), payload.token, payload.activeNotification))
+                        call.respond(HttpStatusCode.Created, mapOf("message" to "User is now online"))
+                    }
                 } else {
                     call.respond(HttpStatusCode.Unauthorized, mapOf("message" to "Invalid token"))
                 }
+            } else {
+                call.respond(HttpStatusCode.BadRequest, mapOf("message" to "Empty token received"))
+            }
+        }
+        delete {
+            val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+                ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
+            val userId = username?.let { it1 -> userService.getUserId(it1) }
+
+            if (userId != null) {
+                onlineUserService.removeUserOnline(userId)
+                call.respond(HttpStatusCode.OK, mapOf("message" to "User is now offline"))
+            } else {
+                call.respond(HttpStatusCode.Unauthorized, mapOf("message" to "Invalid token"))
             }
         }
         route("/notification") {
@@ -104,7 +99,7 @@ fun Route.onlineUsersDefault(jwtService: JWTService) {
 fun Route.onlineUsersAdmin() {
     val onlineUserService = OnlineUserService()
 
-    route("/onlineUser") {
+    route("/online-user") {
         route("/add/{userId}") {
             post {
                 val payload = call.receive<OnlineUserRequest>()

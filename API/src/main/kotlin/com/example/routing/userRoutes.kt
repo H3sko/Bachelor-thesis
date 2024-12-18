@@ -2,13 +2,11 @@ package com.example.routing
 
 import com.example.jwt.JWTService
 import com.example.models.ExposedUsers
-import com.example.models.PasswordChangeRequest
 import com.example.models.UserRequest
 import com.example.service.UserService
 import com.example.utils.generateSalt
 import com.example.utils.sha256WithSalt
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -47,37 +45,6 @@ fun Route.usersDefault(jwtService: JWTService) {
                         }
                     } else {
                         call.respond(HttpStatusCode.Conflict, "User already exists")
-                    }
-                } else {
-                    call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
-                }
-            }
-        }
-        route("/changePassword") {
-            put {
-                val user = call.receive<PasswordChangeRequest>()
-                if (user.username.isNotEmpty() && user.oldPassword.isNotEmpty() && user.newPassword.isNotEmpty()) {
-                    val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
-                        ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
-
-                    if (username != null) {
-                        if (username == user.username) {
-                            val exposedUser = userService.getUser(username)
-                            if (exposedUser != null) {
-                                val oldPasswordHash = sha256WithSalt(user.oldPassword, exposedUser.salt)
-                                if (oldPasswordHash == exposedUser.passwordHash) {
-                                    val newPasswordHash = sha256WithSalt(user.newPassword, exposedUser.salt)
-                                    userService.update(PasswordChangeRequest(username, exposedUser.passwordHash, newPasswordHash))
-                                    call.respond(HttpStatusCode.OK, "Password changed")
-                                }
-                            } else {
-                                call.respond(HttpStatusCode.BadRequest, "User doesn't exist")
-                            }
-                        } else {
-                            call.respond(HttpStatusCode.BadRequest, "Wrong username")
-                        }
-                    } else {
-                        call.respond(HttpStatusCode.BadRequest, "Invalid credentials", )
                     }
                 } else {
                     call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")

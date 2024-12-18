@@ -46,7 +46,7 @@ class GeofenceApiTest {
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
             .body("[{\"latitude\":40.1,\"longitude\":-74.1},{\"latitude\":40.3,\"longitude\":-74.3}]")
-            .post("/geofence/add/6")
+            .post("/geofence/device/6")
 
         Assertions.assertEquals(400, response.statusCode)
     }
@@ -58,7 +58,7 @@ class GeofenceApiTest {
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
             .body("[{\"latitude\":40.1,\"longitude\":-74.1},{\"latitude\":40.3,\"longitude\":-74.3},{\"latitude\":40.5,\"longitude\":-74.5}]")
-            .post("/geofence/add/666666")
+            .post("/geofence/device/666666")
 
         Assertions.assertEquals(404, response.statusCode)
     }
@@ -70,7 +70,7 @@ class GeofenceApiTest {
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
             .body("[{\"latitude\":40.1,\"longitude\":-74.1},{\"latitude\":40.3,\"longitude\":-74.3},{\"latitude\":40.5,\"longitude\":-74.5}]")
-            .post("/geofence/add/7")
+            .post("/geofence/device/7")
 
         Assertions.assertEquals(401, response.statusCode)
     }
@@ -82,7 +82,7 @@ class GeofenceApiTest {
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
             .body("[{\"latitude\":40.1,\"longitude\":-74.1},{\"latitude\":40.3,\"longitude\":-74.3},{\"latitude\":40.5,\"longitude\":-74.5}]")
-            .post("/geofence/add/6")
+            .post("/geofence/device/6")
 
         Assertions.assertEquals(200, response.statusCode)
     }
@@ -126,7 +126,7 @@ class GeofenceApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .delete("/geofence/delete/device/666666")
+            .delete("/geofence/device/666666")
 
         Assertions.assertEquals(404, response.statusCode)
     }
@@ -137,7 +137,7 @@ class GeofenceApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .delete("/geofence/delete/device/7")
+            .delete("/geofence/device/7")
 
         Assertions.assertEquals(401, response.statusCode)
     }
@@ -148,7 +148,7 @@ class GeofenceApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .delete("/geofence/delete/device/6")
+            .delete("/geofence/device/6")
 
         Assertions.assertEquals(200, response.statusCode)
     }

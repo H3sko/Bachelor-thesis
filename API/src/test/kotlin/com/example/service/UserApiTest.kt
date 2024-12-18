@@ -129,54 +129,6 @@ class UserApiTest {
 
     @Test
     @Order(9)
-    fun testFirstChangePassword404() {
-        val response = RestAssured.given()
-            .header("Authorization", userToken)
-            .contentType(ContentType.JSON)
-            .body("{\"username\": \"user2\", \"oldPassword\": \"user666666\", \"newPassword\": \"user3\"}")
-            .put("/user/changePassword")
-
-        Assertions.assertEquals(404, response.statusCode)
-    }
-
-    @Test
-    @Order(10)
-    fun testSecondChangePassword400() {
-        val response = RestAssured.given()
-            .header("Authorization", userToken)
-            .contentType(ContentType.JSON)
-            .body("{\"username\": \"user666666\", \"oldPassword\": \"user2\", \"newPassword\": \"user3\"}")
-            .put("/user/changePassword")
-
-        Assertions.assertEquals(400, response.statusCode)
-    }
-
-    @Test
-    @Order(11)
-    fun testThirdChangePassword400() {
-        val response = RestAssured.given()
-            .header("Authorization", userToken)
-            .contentType(ContentType.JSON)
-            .body("{\"username\": \"user666666\", \"oldPassword\": \"user666666\", \"newPassword\": \"user3\"}")
-            .put("/user/changePassword")
-
-        Assertions.assertEquals(400, response.statusCode)
-    }
-
-    @Test
-    @Order(12)
-    fun testChangePassword200() {
-        val response = RestAssured.given()
-            .header("Authorization", userToken)
-            .contentType(ContentType.JSON)
-            .body("{\"username\": \"user2\", \"oldPassword\": \"user2\", \"newPassword\": \"user3\"}")
-            .put("/user/changePassword")
-
-        Assertions.assertEquals(200, response.statusCode)
-    }
-
-    @Test
-    @Order(13)
     fun testAdminGetAllUsers() {
         val response = RestAssured.given()
             .header("Authorization", adminToken)
@@ -187,7 +139,7 @@ class UserApiTest {
     }
 
     @Test
-    @Order(14)
+    @Order(10)
     fun testAdminDeleteUser() {
         val response = RestAssured.given()
             .header("Authorization", adminToken)

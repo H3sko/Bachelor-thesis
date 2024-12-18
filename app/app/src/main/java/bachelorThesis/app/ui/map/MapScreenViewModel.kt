@@ -57,8 +57,7 @@ class MapScreenViewModel @Inject constructor(
     ) : ViewModel() {
     private val _state: MutableState<MapScreenState> = mutableStateOf(MapScreenState())
     val state: State<MapScreenState> = _state
-
-    private var token: String = "" // TODO: Mozno trochu shady, uvidim co Lukas povie, ked tak prerobim ze v kazdej funkcii si bude vzdy najprv volat getJwtTokenUseCase()
+    private var token: String = ""
 
     init {
         initMapScreenViewModel()

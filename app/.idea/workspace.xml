@@ -10,9 +10,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1e66b744-d519-4658-ab7f-564a4446e265" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/kotlinc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/1259" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/1259" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16386" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16386" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16394" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16394" afterDir="false" />
@@ -20,8 +17,6 @@
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16401" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16401" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16408" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16408" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16409" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16409" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16409_fsm" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16409_fsm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16409_vm" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16409_vm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16413" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16413" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16420" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16420" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16421" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16421" afterDir="false" />
@@ -33,20 +28,33 @@
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16445" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16445" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/16449" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/16449" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/2619" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/2619" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/2696" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/2696" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/base/16384/pg_internal.init" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/base/16384/pg_internal.init" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/global/pg_control" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/global/pg_control" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/global/pg_internal.init" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/global/pg_internal.init" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/pg_stat/pgstat.stat" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/pg_subtrans/0000" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/pg_subtrans/0000" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../API/db/data/pg_wal/000000010000000000000001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/pg_wal/000000010000000000000002" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/pg_wal/000000010000000000000002" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../API/db/data/pg_xact/0000" beforeDir="false" afterPath="$PROJECT_DIR$/../API/db/data/pg_xact/0000" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/main/kotlin/com/example/routing/OnlineUserRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/main/kotlin/com/example/routing/OnlineUserRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/main/kotlin/com/example/routing/deviceRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/main/kotlin/com/example/routing/deviceRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/main/kotlin/com/example/routing/geofenceRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/main/kotlin/com/example/routing/geofenceRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/main/kotlin/com/example/routing/locationRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/main/kotlin/com/example/routing/locationRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/main/kotlin/com/example/routing/userRoutes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/main/kotlin/com/example/routing/userRoutes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/DeviceApiTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/DeviceApiTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/GeofenceApiTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/GeofenceApiTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/LocationApiTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/LocationApiTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/OnlineUsersApiTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/OnlineUsersApiTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/UserApiTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/UserApiTest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/calls/devicesTest.http" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/calls/devicesTest.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/calls/geofencesTest.http" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/calls/geofencesTest.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/calls/locationsTest.http" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/calls/locationsTest.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/calls/onlineUsersTest.http" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/calls/onlineUsersTest.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/calls/usersTest.http" beforeDir="false" afterPath="$PROJECT_DIR$/../API/src/test/kotlin/com/example/service/calls/usersTest.http" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/bachelorThesis/app/common/IconResource.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/bachelorThesis/app/common/IconResource.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/bachelorThesis/app/ui/home/HomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/bachelorThesis/app/ui/home/HomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/bachelorThesis/app/data/remote/BackendApi.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/bachelorThesis/app/data/remote/BackendApi.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/bachelorThesis/app/ui/map/MapScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/bachelorThesis/app/ui/map/MapScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/bachelorThesis/app/ui/map/MapScreenViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/bachelorThesis/app/ui/map/MapScreenViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

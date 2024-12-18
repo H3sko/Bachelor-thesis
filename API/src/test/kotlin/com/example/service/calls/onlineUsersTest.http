@@ -1,4 +1,4 @@
-POST http://127.0.0.1:8080/onlineUser/add
+POST http://127.0.0.1:8080/online-user
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODQ5NjI2NX0.cYFAhTpHxBfNPlHvKawMLfPWYrJSyOIu9HLDv8s8fuA
 
@@ -8,12 +8,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwia
 }
 
 ###
-DELETE http://127.0.0.1:8080/onlineUser/remove
+DELETE http://127.0.0.1:8080/online-user
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODQ5NjI2NX0.cYFAhTpHxBfNPlHvKawMLfPWYrJSyOIu9HLDv8s8fuA
 
 ###
-PUT http://127.0.0.1:8080/onlineUser/notification/switch
+PUT http://127.0.0.1:8080/online-user/notification/switch
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcyODQ5NjI2NX0.cYFAhTpHxBfNPlHvKawMLfPWYrJSyOIu9HLDv8s8fuA
 

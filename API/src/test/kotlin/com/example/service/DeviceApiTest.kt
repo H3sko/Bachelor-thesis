@@ -35,7 +35,7 @@ class DeviceApiTest {
             .header("Authorization", userToken)
             .contentType(ContentType.JSON)
             .body("{\"name\": \"Michal’s Airtag\",\"owner\": \"\"}")
-            .post("/device/add")
+            .post("/device")
 
         Assertions.assertEquals(400, response.statusCode)
     }
@@ -47,7 +47,7 @@ class DeviceApiTest {
             .header("Authorization", userToken)
             .contentType(ContentType.JSON)
             .body("{\"name\": \"\",\"owner\": \"owner@localhost\"}")
-            .post("/device/add")
+            .post("/device")
 
         Assertions.assertEquals(400, response.statusCode)
     }
@@ -59,7 +59,7 @@ class DeviceApiTest {
             .header("Authorization", userToken)
             .contentType(ContentType.JSON)
             .body("{\"name\": \"Michal’s Airtag\",\"owner\": \"owner@localhost\"}")
-            .post("/device/add")
+            .post("/device")
 
         Assertions.assertEquals(200, response.statusCode)
         Assertions.assertNotNull(response.jsonPath().getInt(""))
@@ -73,7 +73,7 @@ class DeviceApiTest {
             .header("Authorization", userToken)
             .contentType(ContentType.JSON)
             .body("{\"name\": \"Michal’s Airtag\",\"owner\": \"owner@localhost\"}")
-            .post("/device/add")
+            .post("/device")
 
         Assertions.assertEquals(409, response.statusCode)
     }
@@ -84,7 +84,7 @@ class DeviceApiTest {
         val response: Response = RestAssured.given()
             .header("Authorization", userToken)
             .contentType(ContentType.JSON)
-            .get("/device/getUserDevices")
+            .get("/device/all")
 
         Assertions.assertEquals(200, response.statusCode)
 
@@ -98,7 +98,7 @@ class DeviceApiTest {
         val response: Response = RestAssured.given()
             .header("Authorization", userToken)
             .contentType(ContentType.JSON)
-            .delete("/device/remove/$deviceId")
+            .delete("/device/$deviceId")
 
         Assertions.assertEquals(200, response.statusCode)
     }

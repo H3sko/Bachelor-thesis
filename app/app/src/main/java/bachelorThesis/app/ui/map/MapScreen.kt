@@ -70,6 +70,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import bachelorThesis.app.common.DrawerContentType
 import bachelorThesis.app.common.IconResource
 import bachelorThesis.app.ui.destinations.HomeScreenDestination
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -779,7 +780,7 @@ private fun MapScreenContent(
             }
         }
     ) {
-        if (state.locationLatest != null) { // TODO: pridat nejaku icon mozno, upravit marker nech je krajsi
+        if (state.locationLatest != null) {
             Marker(state = rememberMarkerState(position = LatLng(state.locationLatest!!.latitude, state.locationLatest!!.longitude)))
         }
         if (state.locationHistory.isNotEmpty()) {
@@ -804,7 +805,8 @@ private fun MapScreenContent(
             if (state.addingGeofence) {
                 for (point in state.addedGeofenceVertices) {
                     Marker(
-                        state = rememberMarkerState(position = LatLng(point.latitude, point.longitude))
+                        state = rememberMarkerState(position = LatLng(point.latitude, point.longitude)),
+                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
                     )
                 }
             }

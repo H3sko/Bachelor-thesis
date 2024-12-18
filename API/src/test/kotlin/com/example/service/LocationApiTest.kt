@@ -47,7 +47,7 @@ class LocationApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .get("/location/getLatest/6666666")
+            .get("/location/latest/device/6666666")
 
         Assertions.assertEquals(404, response.statusCode)
     }
@@ -58,7 +58,7 @@ class LocationApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .get("/location/getLatest/7")
+            .get("/location/latest/device/7")
 
         Assertions.assertEquals(401, response.statusCode)
     }
@@ -69,7 +69,7 @@ class LocationApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .get("/location/getLatest/6")
+            .get("/location/latest/device/6")
 
         Assertions.assertEquals(409, response.statusCode)
     }
@@ -81,7 +81,7 @@ class LocationApiTest {
             .contentType(ContentType.JSON)
             .header("Authorization", adminToken)
             .body("{\"deviceId\": 6, \"latitude\": 49.210060, \"longitude\": 16.599250, \"timestamp\": \"2024-10-10T08:00:00\"}")
-            .post("/location/add")
+            .post("/location")
 
         Assertions.assertEquals(201, response.statusCode)
         Assertions.assertNotNull(response.jsonPath().getInt(""))
@@ -96,7 +96,7 @@ class LocationApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .get("/location/getLatest/6")
+            .get("/location/latest/device/6")
 
         Assertions.assertEquals(200, response.statusCode)
 
@@ -111,7 +111,7 @@ class LocationApiTest {
             .contentType(ContentType.JSON)
             .header("Authorization", adminToken)
             .body("{\"deviceId\": 6, \"latitude\": 49.210800, \"longitude\": 16.598400, \"timestamp\": \"2024-10-10T09:30:00\"}")
-            .post("/location/add")
+            .post("/location")
 
         Assertions.assertEquals(201, response.statusCode)
         Assertions.assertNotNull(response.jsonPath().getInt(""))
@@ -126,7 +126,7 @@ class LocationApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .get("/location/getLatest/6")
+            .get("/location/latest/device/6")
 
         Assertions.assertEquals(200, response.statusCode)
 
@@ -140,7 +140,7 @@ class LocationApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .get("/location/getAll/666666")
+            .get("/location/all/device/666666")
 
         Assertions.assertEquals(400, response.statusCode)
     }
@@ -151,7 +151,7 @@ class LocationApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .get("/location/getAll/7")
+            .get("/location/all/device/7")
 
         Assertions.assertEquals(401, response.statusCode)
     }
@@ -162,7 +162,7 @@ class LocationApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .get("/location/getAll/")
+            .get("/location/all/device/")
 
         Assertions.assertEquals(404, response.statusCode)
     }
@@ -173,7 +173,7 @@ class LocationApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .get("/location/getAll/6")
+            .get("/location/all/device/6")
 
         Assertions.assertEquals(200, response.statusCode)
     }
@@ -206,7 +206,7 @@ class LocationApiTest {
         val response: Response = RestAssured.given()
             .contentType(ContentType.JSON)
             .header("Authorization", userToken)
-            .get("/location/getAll/6")
+            .get("/location/all/device/6")
 
         Assertions.assertEquals(409, response.statusCode)
     }

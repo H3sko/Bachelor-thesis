@@ -6,7 +6,6 @@ import com.example.models.DeviceCredentials
 import com.example.models.ExposedDevices
 import com.example.service.UserService
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -16,10 +15,9 @@ fun Route.devicesDefault(jwtService: JWTService) {
     val deviceService = DeviceService()
     val userService = UserService()
     route("/device") {
-        route("/add") {
-            post {
-//                if ITEMS.DATA wasn't encrypted
-//
+        post {
+
+//                /* implementation for DataFetchJob*/
 //                val deviceCredentials = call.receive<DeviceCredentials>()
 //                if (deviceCredentials.name.isEmpty() || deviceCredentials.owner.isEmpty()){
 //                    call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
@@ -44,28 +42,28 @@ fun Route.devicesDefault(jwtService: JWTService) {
 //                    call.respond(HttpStatusCode.NotFound, "Device ${deviceCredentials.name} that belongs to ${deviceCredentials.owner} was not found")
 //                }
 
-                val deviceCredentials = call.receive<DeviceCredentials>()
-                if (deviceCredentials.name.isNotEmpty() && deviceCredentials.owner.isNotEmpty()){
-                    val serialNumber: String = (deviceService.getAllIds().size + 1).toString()
-                    val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
-                        ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
-                    val userId = username?.let { it1 -> userService.getUserId(it1) }
-                    val deviceIsInDatabase = userId?.let { _ -> deviceService.inDatabaseByNameAndOwner(deviceCredentials.name, userId) }
+            /* implementation for DataAlterJob*/
+            val deviceCredentials = call.receive<DeviceCredentials>()
+            if (deviceCredentials.name.isNotEmpty() && deviceCredentials.owner.isNotEmpty()){
+                val serialNumber: String = (deviceService.getAllIds().size + 1).toString()
+                val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+                    ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }
+                val userId = username?.let { it1 -> userService.getUserId(it1) }
+                val deviceIsInDatabase = userId?.let { _ -> deviceService.inDatabaseByNameAndOwner(deviceCredentials.name, userId) }
 
-                    if (deviceIsInDatabase != null) {
-                        if (deviceIsInDatabase.not()) {
-                            val deviceId = deviceService.create(ExposedDevices(userId, deviceCredentials.name, serialNumber))
-                            call.respond(HttpStatusCode.OK, deviceId)
-                        } else {
-                            call.respond(HttpStatusCode.Conflict, "This device is already in the database")
-                        }
+                if (deviceIsInDatabase != null) {
+                    if (deviceIsInDatabase.not()) {
+                        val deviceId = deviceService.create(ExposedDevices(userId, deviceCredentials.name, serialNumber))
+                        call.respond(HttpStatusCode.OK, deviceId)
+                    } else {
+                        call.respond(HttpStatusCode.Conflict, "This device is already in the database")
                     }
-                } else {
-                    call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
                 }
+            } else {
+                call.respond(HttpStatusCode.BadRequest, "Credentials cannot be empty")
             }
         }
-        route("/remove/{id}") {
+        route("/{id}") {
             delete {
                 val id = call.parameters["id"]?.toInt()
 
@@ -81,7 +79,7 @@ fun Route.devicesDefault(jwtService: JWTService) {
                 }
             }
         }
-        route("/getUserDevices") {
+        route("/all") {
             get {
                 val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
                     ?.let { it1 -> jwtService.extractUsernameFromToken(it1) }

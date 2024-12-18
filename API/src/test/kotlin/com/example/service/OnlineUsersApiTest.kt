@@ -34,7 +34,7 @@ class OnlineUsersApiTest {
             .header("Authorization", userToken)
             .contentType(ContentType.JSON)
             .body("{\"token\": \"\", \"activeNotification\": false}")
-            .post("/onlineUser/add")
+            .post("/online-user")
 
         Assertions.assertEquals(400, response.statusCode)
     }
@@ -46,7 +46,7 @@ class OnlineUsersApiTest {
             .header("Authorization", userToken)
             .contentType(ContentType.JSON)
             .body("{\"token\": \"abcde\", \"activeNotification\": false}")
-            .post("/onlineUser/add")
+            .post("/online-user")
 
         Assertions.assertEquals(201, response.statusCode)
     }
@@ -58,7 +58,7 @@ class OnlineUsersApiTest {
             .header("Authorization", userToken)
             .contentType(ContentType.JSON)
             .body("{\"token\": \"edcba\", \"activeNotification\": false}")
-            .post("/onlineUser/add")
+            .post("/online-user")
 
         Assertions.assertEquals(200, response.statusCode)
     }
@@ -69,7 +69,7 @@ class OnlineUsersApiTest {
         val response: Response = RestAssured.given()
             .header("Authorization", userToken)
             .contentType(ContentType.JSON)
-            .delete("/onlineUser/remove")
+            .delete("/online-user")
 
         Assertions.assertEquals(200, response.statusCode)
     }

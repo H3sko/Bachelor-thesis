@@ -16,11 +16,6 @@ Content-Type: application/json
 }
 
 ###
-GET http://127.0.0.1:8080/user/44
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTA5MTczNH0.OFTsH1rPSBxiLNS5rVJoPzd0_rLgMwjtCC2UZnId08c
-
-###
 PUT http://127.0.0.1:8080/user/changePassword
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJudWxsIiwiaXNzIjoibnVsbCIsInVzZXJuYW1lIjoidXNlciIsImV4cCI6MzYwMDAwMTcxNTA5MTczNH0.OFTsH1rPSBxiLNS5rVJoPzd0_rLgMwjtCC2UZnId08c

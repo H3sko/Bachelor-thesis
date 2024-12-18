@@ -9,7 +9,6 @@ import com.example.service.GeofenceService
 import com.example.service.GeofenceVerticesService
 import com.example.service.UserService
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -21,7 +20,7 @@ fun Route.geofencesDefault(jwtService: JWTService) {
     val deviceService = DeviceService()
     val geofenceVerticesService = GeofenceVerticesService()
     route("/geofence") {
-        route("/add/{deviceId}") {
+        route("/device/{deviceId}") {
             post {
                 val deviceId = call.parameters["deviceId"]?.toInt()
                 val vertices = call.receive<List<GeofenceVertex>>()
@@ -53,8 +52,6 @@ fun Route.geofencesDefault(jwtService: JWTService) {
 
                 }
             }
-        }
-        route("/device/{deviceId}") {
             get {
                 val deviceId = call.parameters["deviceId"]?.toInt()
                 val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
@@ -78,8 +75,6 @@ fun Route.geofencesDefault(jwtService: JWTService) {
                     call.respond(HttpStatusCode.BadRequest, "Device $deviceId not found")
                 }
             }
-        }
-        route("/delete/device/{deviceId}") {
             delete {
                 val deviceId = call.parameters["deviceId"]?.toInt()
                 val username = call.request.headers["Authorization"]?.removePrefix("Bearer ")
